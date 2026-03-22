@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pobieranie Krwii - Zamówienie</title>
+</head>
+<body>
+    <nav>
+    <a href="/">Nowe zamówienie</a>
+    <a href="/historia">Historia zamówień</a>
+</nav>
+
+    <h1>Zestaw do samodzielnego pobrania krwii</h1>
+    
+    <form action="/zamow" method="post">
+        <label for="wiek">Wiek:</label>
+        <input type="number" id="wiek" name="wiek" min="18">
+
+        <label for="ilosc_probek">Ilość próbek:</label>
+        <input type="number" id="ilosc_probek" name="ilosc_probek" min="1" max="5">
+
+            <P>Wybierz badania(max 5):</P>
+        <input type="checkbox" id="tarczyca" name="badania" value="tarczyca">
+        <label for="tarczyca">Tarczyca (TSH)</label><br>
+        <input type="checkbox" id="cholesterol" name="badania" value="cholesterol">
+        <label for="cholesterol">Profil lipidowy (Cholesterol)</label><br>
+        <input type="checkbox" id="morfologia" name="badania" value="morfologia">
+        <label for="morfologia">Morfologia pełna</label><br>
+        <input type="checkbox" id="glukoza" name="badania" value="glukoza">
+        <label for="glukoza">Glukoza</label><br>
+        <input type="checkbox" id="witamina_D" name="badania" value="witamina_D">
+        <label for="witamina_D">Witamina D</label><br>
+        <input type="checkbox" id="choroby_krwi" name="badania" value="choroby_krwi">
+        <label for="choroby_krwi">Choroby krwi (skaza krwotoczna)</label><br>
+        <input type="checkbox" id="alergie" name="badania" value="alergie">
+        <label for="alergie">Alergie</label><br>
+        <input type="checkbox" id="gurpa_krwi" name="badania" value="grupa_krwi">
+        <label for="gurpa_krwi">Grupa krwi</label><br>
+        <input type="checkbox" id="zaburzenia_elektrolitowe" name="badania" value="zaburzenia_elektrolitowe">
+        <label for="zaburzenia_elektrolitowe">Zaburzenia elektrolitowe (Poziom sodu, potasu, magnezu)</label><br>
+        <input type="checkbox" id="anemia" name="badania" value="anemia">
+        <label for="anemia">Anemia</label><br>
+
+        <input type="submit" value="Prześlij">
+    </form>
+</body>
+</html>
+

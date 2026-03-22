@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+< lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historia Zamówień</title>
+</head>
+<>
+    <table border="1">
+    <thead>
+        <tr>
+            <th>Wiek</th>
+            <th>Ilość próbek</th>
+            <th>Badania</th>
+            <th>Data</th>
+            <th>Akcja</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% if (myOrder && myOrder.length > 0) { %>
+            <% myOrder.forEach(z => { %>
+                <tr>
+                    <td><%= z.wiek %></td>
+                    <td><%= z.ilosc %></td>
+                    <td><%= Array.isArray(z.badanie) ? z.badanie.join(', ') : z.badanie %></td>
+                    <td><%= new Date(z.data).toLocaleDateString() %></td>
+                    <td>
+  <a href="/usun/<%= myOrder.indexOf(z) %>" 
+     onclick="return confirm('Czy na pewno usunąć?')" 
+     style="color: red; text-decoration: none; font-weight: bold;">
+     [ Usuń ]
+  </a>
+</td>
+                </tr>
+            <% }); %>
+        <% } else { %>
+            <tr>
+                <td colspan="4">Brak zamówień w systemie.</td>
+            </tr>
+        <% } %>
+    </tbody>
+</table>
+</body>
+</html>
