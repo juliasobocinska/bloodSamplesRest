@@ -1,0 +1,29 @@
+{
+    "sqltools.connections": [
+        {
+            "ssh": "Disabled",
+            "previewLimit": 100,
+            "server": "localhost",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "BloodSamples_Dev",
+            "database": "blood_samples",
+            "username": "postgres"
+        },
+        {
+            "pgOptions": {
+                "ssl": {
+                    "rejectUnauthorized": true
+                }
+            },
+            "ssh": "Disabled",
+            "previewLimit": 100,
+            "server": "ep-damp-heart-agput1a1-pooler.c-2.eu-central-1.aws.neon.tech",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "BloodSamples_CLOUD",
+            "database": "blood_samples",
+            "username": "neondb_owner"
+        }
+    ]
+}
