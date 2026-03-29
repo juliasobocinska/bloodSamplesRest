@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-< lang="en">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Historia Zamówień</title>
 </head>
-<>
-    <table border="1">
+<body> <table border="1">
     <thead>
         <tr>
             <th>Wiek</th>
@@ -18,27 +17,34 @@
     </thead>
     <tbody>
         <% if (myOrder && myOrder.length > 0) { %>
-            <% myOrder.forEach(z => { %>
+            <% # Dodajemy 'index' do nawiasu, żeby móc go użyć w linkach %>
+            <% myOrder.forEach((z, index) => { %> 
                 <tr>
                     <td><%= z.wiek %></td>
                     <td><%= z.ilosc %></td>
                     <td><%= Array.isArray(z.badanie) ? z.badanie.join(', ') : z.badanie %></td>
                     <td><%= new Date(z.data).toLocaleDateString() %></td>
                     <td>
-  <a href="/usun/<%= myOrder.indexOf(z) %>" 
-     onclick="return confirm('Czy na pewno usunąć?')" 
-     style="color: red; text-decoration: none; font-weight: bold;">
-     [ Usuń ]
-  </a>
-</td>
+                        <a href="/delete/<%= index %>" 
+                           onclick="return confirm('Czy na pewno usunąć?')" 
+                           style="color: red; text-decoration: none; font-weight: bold;">
+                           [ Usuń ]
+                        </a>
+                        
+                        <a href="/edit/<%= index %>" style="color: blue; text-decoration: none; font-weight: bold;">
+                           [ Edytuj ]
+                        </a>
+                    </td>
                 </tr>
             <% }); %>
         <% } else { %>
             <tr>
-                <td colspan="4">Brak zamówień w systemie.</td>
+                <td colspan="5">Brak zamówień w systemie.</td>
             </tr>
         <% } %>
     </tbody>
 </table>
+<br>
+<a href="/">Dodaj nowe zamówienie</a>
 </body>
 </html>
