@@ -1,6 +1,6 @@
 const fs = require('node:fs');
 const path = require('path');
-
+//// ścieżka do pliku JSON, gdzie przechowujemy konta użytkowników
 const filePath = path.join(__dirname, '..', 'users.json');
 
 class User {
@@ -10,6 +10,7 @@ class User {
         this.password = password;
     }
 
+    //pobiera wszystkich użytkowników z pliku
     static getAllUsers() {
         try {
             if (!fs.existsSync(filePath)) return [];
@@ -21,13 +22,16 @@ class User {
         }
     }
 
+    //dodaje nowego użytkownika do pliku JSON
     static addToDatabase(newObj) {
         const currentData = this.getAllUsers();
         currentData.push(newObj);
+
         fs.writeFileSync(filePath, JSON.stringify(currentData, null, 2)); 
         console.log('Database updated! Current users:', currentData);
     }
 
+    //sprawdza czy użytkownik o danym ID istnieje
     static findUserByID(id) {
         const currentData = this.getAllUsers();
         
@@ -39,6 +43,7 @@ class User {
         return null;
     }
 
+    //sprawdza czy użytkownik o danym loginie istnieje
     static findUserByLogin(login) {
         const currentData = this.getAllUsers();
 

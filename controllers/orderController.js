@@ -1,12 +1,27 @@
 const OrderModel = require('../models/orderModel'); 
+const ResultTests = require('../models/resultModel');
 
 const orderController = {
+
+    //główna funkcja, która odpowiada za skłądanie zamówienia
     handleOrder: (req, res) => {
+        //pobieranie danych przesłanych z formularza
         const amount = req.body.quantity_samples;
         const age = req.body.age;
         const tests = req.body.tests;
 
-        // Walidacja podstawowa
+        //pobieranie ID zalogowanego użytkownika z sesji
+        const currentUser = req.session.userLogin;
+
+        //sprawdzanie czy użytkownik jest zalogowany
+        if(!req.session.userLogin) {
+            return res.status(401).send(`
+                Musisz się zalogować, aby złożyć zamówienie!
+                <a href="/login">ZALOGUJ SIĘ PONOWNIE</a>
+                <a href="/">Wróć na stronę główną</a>`);
+        }
+ 
+        //Walidacja by sprawdzić poprawność wieku i ilość próbek
         if (amount < 1) {
             return res.status(400).send('Błąd: Nie możesz zamówić 0 próbek!');
         }
@@ -15,33 +30,68 @@ const orderController = {
         }
 
         // Sprawdzanie daty ostatniego zamówienia
-        const lastOrder = OrderModel.getLastOrder();
+        const lastOrder = OrderModel.getLastOrderForUser(currentUser);
         const today = new Date();
         const halfYearAgo = new Date();
         halfYearAgo.setMonth(today.getMonth() - 6);
 
-        if (lastOrder && new Date(lastOrder.date) > halfYearAgo) {
-            return res.status(400).send('Zamówienie może być robione raz na pół roku!');
+        if (lastOrder && new Date(lastOrder.data) > halfYearAgo) {
+            return res.status(400).render('orderError', {});
         }
 
-        // Tworzenie i zapisywanie nowego obiektu
-        const newOrder = new OrderModel(age, amount, tests, today);
+        //Generowanie losowego wyniku badań
+        const randomValue = Math.floor(Math.random() * 100) + 50;
+
+        const checker = new ResultTests(tests, randomValue)
+        const interpretation = checker.getInterpretation();
+
+        //Zapisywanie do bazy. Dodajemy wynik i interpretacje do obiketu zamówienia, żeby były w hsitorii
+        const newOrder = new OrderModel(age, amount, tests, today, currentUser);
+        
+        newOrder.resultValue = randomValue;
+        newOrder.interpretation = interpretation;
+
         OrderModel.addToDatabase(newOrder);
 
-        res.status(201).send(`Sukces! Zamówiono ${amount} próbek! Dane zostały zapisane.`);
+        //wyświetlenie podsumowania po polsku z opcjami powrotu
+        res.status(201).send(`
+            <h1>Potwierdzenie rejestracji badania</h1>
+            <p>Badanie: <strong>${tests}</strong></p>
+            <p>Status: Próbka pobrana.</p>
+            <hr>
+            <div style="background-color: #fff3cd; padding: 15px; border: 1px solid #ffeeba;">
+                <strong>Wstępna analiza:</strong>
+                <p>${interpretation}</p>
+            </div>
+            <br>
+            <a href="/history">ZOBACZ PEŁNĄ HISTORIĘ</a> | <a href="/">NOWE ZAMÓWIENIE</a>
+        `);
     },
 
+    //wyświetlenie listy zamówień należących tylko do zalogowanego użytkownika
     showList: (req, res) => {
-        const orders = OrderModel.getAllOrders();
-        res.render('history', { myOrders: orders });
+        if (!req.session.userLogin) {
+            return res.redirect('/login');
+        }
+
+        //pobieranie ID użytkownika
+        const uid = req.session.userLogin;
+        //pobieranie wszystkich rekordów z JSON
+        const allOrders = OrderModel.getAllOrders();
+        //FILTROWANIE: Zwrócenie tylko tych zamówień, których 'owner' zgadza się z ID sesji
+        const onlyMyOrders = allOrders.filter(order => order.owner == uid);
+
+        res.render('history', { myOrders: onlyMyOrders });
     },
 
+    //usuwanie zamówień na podstawie indeksu (ID z URL)
     deleteOrder: (req, res) => {
         const id = req.params.id;
         OrderModel.deleteFromDatabase(id);
-        res.redirect('/history'); // Zmieniłam na przekierowanie do historii, żeby widzieć efekt usunięcia
+        res.redirect('/history');  
     },
 
+    //wyświetlenie formmularza edycji z załadowanymi danymi konkretnego zamówienia
     showEditForm: (req, res) => {
         const id = req.params.id;
         const allOrders = OrderModel.getAllOrders();
@@ -50,6 +100,7 @@ const orderController = {
         res.render('edit', {order: orderToEdit, id: id});
     },
 
+    // Aktualizacja istniejącego zamówienia
     updateOrder: (req, res) => {
         const id = req.params.id;
 
@@ -61,6 +112,7 @@ const orderController = {
             age: age,
             amount: amount,
             tests: tests,
+            owner: req.session.userLogin,
             date: new Date()
         };
 

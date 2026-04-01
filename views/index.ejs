@@ -7,8 +7,11 @@
 </head>
 <body>
     <nav>
-    <a href="/">Nowe zamówienie</a>
+    <a href="/">Strona Główna</a>
+    <a href="/login" style="margin-right: 15px;">Zaloguj się</a>
+    <a href="/register" style="margin-right: 15px;">Zarejestruj się</a>
     <a href="/history">Historia zamówień</a>
+    <a href="/logout" style="color: red;">Wyloguj</a>
 </nav>
 
     <h1>Zestaw do samodzielnego pobrania krwii</h1>
@@ -21,25 +24,25 @@
         <input type="number" id="quantity_samples" name="quantity_samples" min="1" max="5">
 
             <P>Wybierz badania(max 5):</P>
-        <input type="checkbox" id="thyroid" name="tests" value="thyroid">
+        <input type="checkbox" id="thyroid" name="tests" value="Tarczyca">
         <label for="thyroid">Tarczyca (TSH)</label><br>
-        <input type="checkbox" id="cholesterol" name="tests" value="cholesterol">
+        <input type="checkbox" id="cholesterol" name="tests" value="Cholesterol">
         <label for="cholesterol">Profil lipidowy (Cholesterol)</label><br>
-        <input type="checkbox" id="morphology" name="badania" value="morphology">
+        <input type="checkbox" id="morphology" name="badania" value="Morfologia">
         <label for="morphology">Morfologia pełna</label><br>
-        <input type="checkbox" id="glucose" name="tests" value="glucose">
+        <input type="checkbox" id="glucose" name="tests" value="Glukoza">
         <label for="glucose">Glukoza</label><br>
-        <input type="checkbox" id="vitamine_D" name="tests" value="vitamine_D">
+        <input type="checkbox" id="vitamine_D" name="tests" value="Witamina D">
         <label for="vitamine_D">Witamina D</label><br>
-        <input type="checkbox" id="blood_diseases" name="tests" value="blood_diseases">
+        <input type="checkbox" id="blood_diseases" name="tests" value="Grupa krwii">
         <label for="blood_diseases">Choroby krwi (skaza krwotoczna)</label><br>
-        <input type="checkbox" id="allergies" name="tests" value="allergies">
+        <input type="checkbox" id="allergies" name="tests" value="Alergie">
         <label for="allergies">Alergie</label><br>
-        <input type="checkbox" id="blood_type" name="tests" value="blood_type">
+        <input type="checkbox" id="blood_type" name="tests" value="Grupa krwi">
         <label for="blood_type">Grupa krwi</label><br>
-        <input type="checkbox" id="electrolyte_disorders" name="tests" value="electrolyte_disorders">
+        <input type="checkbox" id="electrolyte_disorders" name="tests" value="Elektrolity">
         <label for="electrolyte_disorders">Zaburzenia elektrolitowe (Poziom sodu, potasu, magnezu)</label><br>
-        <input type="checkbox" id="anemia" name="tests" value="anemia">
+        <input type="checkbox" id="anemia" name="tests" value="Anemia">
         <label for="anemia">Anemia</label><br>
 
         <input type="submit" value="Prześlij">

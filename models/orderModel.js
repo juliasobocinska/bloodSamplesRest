@@ -1,34 +1,40 @@
 const fs = require('node:fs');
 const path = require('path');
-
+// Ścieżka do pliku JSON, w którym przechowujemy wszystkie złożone zamówienia
 const filePath = path.join(__dirname, '..', 'orders.json');
 
 const dataBaseOrder = [];
 
 class Order {
-    constructor(age, quantity, tests, data) {
+    constructor(age, quantity, tests, data, owner) {
         this.age = age;
         this.quantity = quantity;
         this.tests = tests;
         this.data = data;
+        this.owner = owner;
     }
 
+    //pobieranie obecnych danych, dodanie nowego obiektu i zapisanie całości do pliku
     static addToDatabase(newObj) {
         const currentData = this.getAllOrders();
         currentData.push(newObj);
+
         fs.writeFileSync(filePath, JSON.stringify(currentData, null, 2)); 
         console.log('Database updated! Current orders:', currentData);
     }
 
-    static getLastOrder() {
-        return dataBaseOrder[dataBaseOrder.length - 1];
+    //pobieranie ostatniego zamówienia
+    static getLastOrderForUser(owner) {
+        const userOrders = this.getAllOrders().filter((order) => order.owner == owner); 
+        return userOrders[userOrders.length - 1];
     }
 
+    //odczytanie wszystkich elementów
     static getAllOrders() {
         try {
-            if (!fs.existsSync(p)) return [];
+            if (!fs.existsSync(filePath)) return [];
 
-            const filesData = fs.readFileSync(p, 'utf8');
+            const filesData = fs.readFileSync(filePath, 'utf8');
             return filesData ? JSON.parse(filesData) : [];
         } catch (err) {
 
@@ -36,15 +42,19 @@ class Order {
     }
 }
 
-    static deleteFromBase(id) {
+    //usuwanie, filtruje listę tak, aby wyrzucić element o danym indeksie
+    static deleteFromDatabase(id) {
         const actualList = this.getAllOrders();
         const newList = actualList.filter((item, index) => index != id);
-        fs.writeFileSync(p, JSON.stringify(newList));
+
+        fs.writeFileSync(filePath, JSON.stringify(newList));
     }
 
+    //aktualizacja, znjadowanie zamówienia po indeksie i podmienia jego dane
     static update(id, updateOrder) {
-        const orders = this.getAll();
+        const orders = this.getAllOrders();
 
+        //sprawdzamy czy zamóienie o takim numerze w ogóle istnieje
         if (orders[id]) {
             orders[id] = updateOrder;
 

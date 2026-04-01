@@ -5,7 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Historia Zamówień</title>
 </head>
-<body> <table border="1">
+<body>
+     <nav>
+    <a href="/history" style="margin-right: 15px;">Historia zamówień</a>
+    <a href="/">Złóż zamówienie</a>
+    <a href="/">Strona Główna</a>
+    <a href="/logout" style="color: red;">Wyloguj</a>
+    <table border="1">
     <thead>
         <tr>
             <th>Wiek</th>
@@ -16,13 +22,12 @@
         </tr>
     </thead>
     <tbody>
-        <% if (myOrder && myOrder.length > 0) { %>
-            <% # Dodajemy 'index' do nawiasu, żeby móc go użyć w linkach %>
-            <% myOrder.forEach((z, index) => { %> 
+        <% if (myOrders && myOrders.length > 0) { %>
+            <% myOrders.forEach((z, index) => { %> 
                 <tr>
-                    <td><%= z.wiek %></td>
-                    <td><%= z.ilosc %></td>
-                    <td><%= Array.isArray(z.badanie) ? z.badanie.join(', ') : z.badanie %></td>
+                    <td><%= z.age %></td>
+                    <td><%= z.quantity %></td>
+                    <td><%= Array.isArray(z.tests) ? z.tests.join(', ') : z.tests %></td>
                     <td><%= new Date(z.data).toLocaleDateString() %></td>
                     <td>
                         <a href="/delete/<%= index %>" 
@@ -44,7 +49,5 @@
         <% } %>
     </tbody>
 </table>
-<br>
-<a href="/">Dodaj nowe zamówienie</a>
 </body>
 </html>
