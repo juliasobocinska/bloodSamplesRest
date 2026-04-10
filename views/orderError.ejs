@@ -1,13 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Błąd zamówienia</title>
-</head>
-<body>
-    <h1>Błąd zamówienia</h1>
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<div class="message-box text-center">
+    <h1 class="text-danger">Błąd zamówienia</h1>
+    <p>Niestety, wystąpił problem podczas przetwarzania Twojego zamówienia. Spróbuj ponownie.</p>
     <br>
-    <a href="/history">Przejdź do historii</a>
-</body>
-</html>
+    <a href="/history" class="action-link edit-link">Powrót do historii</a>
+</div>
+
+<%- include('partials/footer') %>
