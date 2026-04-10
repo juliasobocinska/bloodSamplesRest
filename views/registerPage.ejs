@@ -1,25 +1,17 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Rejestracja</title>
-</head>
-<body>
-     <nav>
-        <a href="/register" style="margin-right: 15px;">Zarejestruj się</a>
-    <a href="/">Strona Główna</a>
-    <a href="/login" style="margin-right: 15px;">Zaloguj się</a>
-    <a href="/history">Historia zamówień</a>
-    <a href="/logout" style="color: red;">Wyloguj</a>
-</nav>
-    <h1>Załóż nowe konto</h1>
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<div class="login-box">
+    <h2>Załóż nowe konto</h2>
     <form action="/register" method="POST">
-        <label>Login:</label><br>
-        <input type="text" name="username" required><br><br>
+        <label for="reg-username">Login:</label><br>
+        <input type="text" id="reg-username" name="username" required placeholder="Wpisz proponowany login"><br><br>
 
-        <label>Hasło:</label><br>
-        <input type="password" name="password" required><br><br>
+        <label for="reg-password">Hasło:</label><br>
+        <input type="password" id="reg-password" name="password" required placeholder="Wpisz bezpieczne hasło"><br><br>
 
-        <button type="submit">Zarejestruj się</button>
+        <button type="submit" class="btn-submit">Zarejestruj się</button>
     </form>
-</body>
-</html>
+</div>
+
+<%- include('partials/footer') %>
