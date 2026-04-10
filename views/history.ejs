@@ -1,17 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Historia Zamówień</title>
-</head>
-<body>
-     <nav>
-    <a href="/history" style="margin-right: 15px;">Historia zamówień</a>
-    <a href="/">Złóż zamówienie</a>
-    <a href="/">Strona Główna</a>
-    <a href="/logout" style="color: red;">Wyloguj</a>
-    <table border="1">
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<h1>Historia Zamówień</h1>
+
+<table class="styled-table">
     <thead>
         <tr>
             <th>Wiek</th>
@@ -32,11 +24,11 @@
                     <td>
                         <a href="/delete/<%= index %>" 
                            onclick="return confirm('Czy na pewno usunąć?')" 
-                           style="color: red; text-decoration: none; font-weight: bold;">
+                           class="action-link text-danger">
                            [ Usuń ]
                         </a>
                         
-                        <a href="/edit/<%= index %>" style="color: blue; text-decoration: none; font-weight: bold;">
+                        <a href="/edit/<%= index %>" class="action-link edit-link">
                            [ Edytuj ]
                         </a>
                     </td>
@@ -49,5 +41,5 @@
         <% } %>
     </tbody>
 </table>
-</body>
-</html>
+
+<%- include('partials/footer') %>
