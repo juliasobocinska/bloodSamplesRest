@@ -18,19 +18,12 @@
             <% myOrders.forEach((z, index) => { %> 
                 <tr>
                     <td><%= z.age %></td>
-                    <td><%= z.quantity %></td>
+                    <td><%= z.amount || z.quantity %></td>
                     <td><%= Array.isArray(z.tests) ? z.tests.join(', ') : z.tests %></td>
-                    <td><%= new Date(z.data).toLocaleDateString() %></td>
+                    <td><%= new Date(z.date || z.data).toLocaleDateString() %></td>
                     <td>
-                        <a href="/delete/<%= index %>" 
-                           onclick="return confirm('Czy na pewno usunąć?')" 
-                           class="action-link text-danger">
-                           [ Usuń ]
-                        </a>
-                        
-                        <a href="/edit/<%= index %>" class="action-link edit-link">
-                           [ Edytuj ]
-                        </a>
+                        <a href="/delete/<%= index %>" onclick="return confirm('Czy na pewno?')">[ Usuń ]</a>
+                        <a href="/edit/<%= index %>">[ Edytuj ]</a>
                     </td>
                 </tr>
             <% }); %>

@@ -4,9 +4,23 @@ const userController = {
 
     //rejstracja, tworzymy nowe konto użytkownika
     handleRegister: (req, res) => {
+        try {
         //pobranie danych
-        const login = req.body.username; 
-        const password = req.body.password; 
+        const login = String(req.body.username || "").trim(); 
+        const password = String(req.body.password || ""); 
+        const hasNumber = /\d/.test(password);
+
+        //walidacja loginu i hasła
+        if(login.length > 3 && password.length > 5 && hasNumber) {
+            console.log("Login jest poprawny - ma więcej niż 3 znaki. Hasło jest poprawne - ma więcej niż 5 znaków oraz posiada minimum 1 cyfrę.");
+        } else {
+            return res.status(400).send(`
+                <script>
+                    alert("Błąd: Login musi mieć min. 4 znaki, a hasło min. 6 znaków i zawierać cyfrę.");
+                    window.location.href = "/register"; // powrót do formularza
+                </script>
+        `);
+        }
 
         //sprawdzenie czy użytkownik o takim loginie już istnieje
         const existingUser = userModel.findUserByLogin(login);
@@ -17,25 +31,33 @@ const userController = {
 
             userModel.addToDatabase(newUser);
 
-            res.redirect('/login');
+            res.status(201).redirect('/login');
         } else {
-            return res.send("Login is already being used");
+            return res.status(409).send(`
+                <script>
+                alert("Login is already being used");
+                window.location.href = "/register";
+                </script>
+                `);
         }
+    } catch (error) {
+        return res.status(500).send("Wystąpił błąd:" + error.message);
+    }
     },
 
     //weryfikacja danych i inicjalizacja sesji
     handleLogin: (req, res) => {
-        const login = req.body.username;
-        const password = req.body.password;
+        const login = String(req.body.username || "").trim();
+        const password = String(req.body.password);
 
         //sprawdzamy czy użytkownik o danym loginie istnieje
         const existingLogin = userModel.findUserByLogin(login);
 
         if (existingLogin && existingLogin.password === password) {
             req.session.userLogin = existingLogin.id;
-            res.redirect('/history');
+            res.status(200).redirect('/history');
         } else {
-            return res.send(`
+            return res.status(401).send(`
                 <script>
                     alert("Błąd logowania: Nieprawidłowy login lub hasło. Spróbuj ponownie.");
                     window.location.href = "/login";
@@ -56,8 +78,8 @@ const userController = {
 
     //sprawdxanie czy hasło zgadza się z id użytkownika danego
     login: (req, res) => {
-        const login = req.body.username;
-        const password = req.body.password;
+        const login = String(req.body.username || "").trim();
+        const password = String(req.body.password);
 
         const user = userModel.findUserByLogin(login);
 
@@ -65,9 +87,9 @@ const userController = {
             if (user.password === password) 
                 res.status(200).send(`Sukces! Zalogowano poprawnie! Login: ${login}, Hasło: ${password}`);
             else
-                res.status(403).send(`Nieprawidłowe hasło: ${password}`);
+                res.status(401).send(`Nieprawidłowe hasło: ${password}`);
         } else 
-             res.status(403).send(`Brak użytkownika o loginie: ${login}`);
+             res.status(404).send(`Brak użytkownika o loginie: ${login}`);
     }
 }
 

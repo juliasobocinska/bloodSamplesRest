@@ -6,11 +6,11 @@ const filePath = path.join(__dirname, '..', 'orders.json');
 const dataBaseOrder = [];
 
 class Order {
-    constructor(age, quantity, tests, data, owner) {
+    constructor(age, quantity, tests, date, owner) {
         this.age = age;
         this.quantity = quantity;
         this.tests = tests;
-        this.data = data;
+        this.date = date;
         this.owner = owner;
     }
 
@@ -23,9 +23,15 @@ class Order {
         console.log('Database updated! Current orders:', currentData);
     }
 
-    //pobieranie ostatniego zamówienia
+    // Pobieranie ostatniego zamówienia - wersja poprawiona
     static getLastOrderForUser(owner) {
-        const userOrders = this.getAllOrders().filter((order) => order.owner == owner); 
+        const allOrders = this.getAllOrders();
+        // Zamieniamy oba ID na String, żeby mieć pewność, że porównujemy tekst z tekstem
+        const userOrders = allOrders.filter((order) => String(order.owner) === String(owner)); 
+        
+        if (userOrders.length === 0) return null;
+        
+        // Zwracamy ostatni element z przefiltrowanej listy
         return userOrders[userOrders.length - 1];
     }
 

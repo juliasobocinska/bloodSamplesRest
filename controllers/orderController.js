@@ -5,10 +5,11 @@ const orderController = {
 
     //główna funkcja, która odpowiada za skłądanie zamówienia
     handleOrder: (req, res) => {
+        try {
         //pobieranie danych przesłanych z formularza
-        const amount = req.body.quantity_samples;
-        const age = req.body.age;
-        const tests = req.body.tests;
+        const amount = Number(req.body.quantity_samples);
+        const age = Number(req.body.age);
+        const tests = String(req.body.tests || "");
 
         //pobieranie ID zalogowanego użytkownika z sesji
         const currentUser = req.session.userLogin;
@@ -35,8 +36,10 @@ const orderController = {
         const halfYearAgo = new Date();
         halfYearAgo.setMonth(today.getMonth() - 6);
 
-        if (lastOrder && new Date(lastOrder.data) > halfYearAgo) {
-            return res.status(400).render('orderError', {});
+        if (lastOrder && new Date(lastOrder.date) > halfYearAgo) {
+            return res.status(400).render('orderError', { 
+            errorMessage: "Niestety, badanie można wykonywać tylko raz na 6 miesięcy." 
+        });
         }
 
         //Generowanie losowego wyniku badań
@@ -66,6 +69,9 @@ const orderController = {
             <br>
             <a href="/history">ZOBACZ PEŁNĄ HISTORIĘ</a> | <a href="/">NOWE ZAMÓWIENIE</a>
         `);
+    } catch (error) {
+        return res.status(500).send("Wystąpił błąd:" + error.message);
+    }
     },
 
     //wyświetlenie listy zamówień należących tylko do zalogowanego użytkownika
@@ -79,7 +85,9 @@ const orderController = {
         //pobieranie wszystkich rekordów z JSON
         const allOrders = OrderModel.getAllOrders();
         //FILTROWANIE: Zwrócenie tylko tych zamówień, których 'owner' zgadza się z ID sesji
-        const onlyMyOrders = allOrders.filter(order => order.owner == uid);
+        const onlyMyOrders = allOrders
+            .map((order, index) => ({ ...order, originalIndex: index })) 
+            .filter(order => order.owner == uid);
 
         res.render('history', { myOrders: onlyMyOrders });
     },
@@ -97,16 +105,26 @@ const orderController = {
         const allOrders = OrderModel.getAllOrders();
         const orderToEdit = allOrders[id];
 
+        //walidacja istnienia orderToEdit
+        if (!orderToEdit) {
+            return res.status(404).send("Nie znaleziono takiego zamówienia.");
+        }
+
         res.render('edit', {order: orderToEdit, id: id});
     },
 
     // Aktualizacja istniejącego zamówienia
     updateOrder: (req, res) => {
+        try {
         const id = req.params.id;
+        const amount = Number(req.body.quantity_samples);
+        const age = Number(req.body.age);
+        const tests = String(req.body.tests || "");
 
-        const amount = req.body.quantity_samples;
-        const age = req.body.age;
-        const tests = req.body.tests;
+        //walidacja
+        if (amount < 1 || age < 18) {
+            return res.status(400).send("Błąd: Niepoprawne dane w formularzu edycji.");
+        }
 
         const updateOrder = {
             age: age,
@@ -118,7 +136,10 @@ const orderController = {
 
         OrderModel.update(id, updateOrder);
         res.redirect("/history");
-    }
-};
+    } catch (error) {
+    return res.status(500).send("Wystąpił błąd:" + error.message);
+}
+}
+}
 
 module.exports = orderController;
