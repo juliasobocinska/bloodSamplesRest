@@ -1,16 +1,6 @@
 {
     "sqltools.connections": [
         {
-            "ssh": "Disabled",
-            "previewLimit": 100,
-            "server": "localhost",
-            "port": 5432,
-            "driver": "PostgreSQL",
-            "name": "BloodSamples_Dev",
-            "database": "blood_samples",
-            "username": "postgres"
-        },
-        {
             "pgOptions": {
                 "ssl": {
                     "rejectUnauthorized": true

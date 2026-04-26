@@ -2,9 +2,10 @@
 const express = require('express');
 const app = express();
 const port = 3000;
-const orderController = require('./controllers/orderController');
-const loginController = require('./controllers/loginController');
+const orderController = require('./controllers/orderController.sql.js'); // test nowego kontrolera
+const loginController = require('./controllers/loginController.sql.js'); // test nowego kontrolera
 const session = require('express-session');
+require('./models/db'); // test bazy
 
 //konfiguracja silnika widoków
 app.set('view engine', 'ejs');
@@ -39,12 +40,13 @@ app.get('/login', loginController.showLoginPage);
 app.post('/login', loginController.handleLogin);
 
 //historia i usuwanie zamówień
-app.get('/history', orderController.showList);
+app.get('/history', orderController.showHistory); 
+// app.get('/history', orderController.showList);
 app.get('/delete/:id', orderController.deleteOrder);
 
 //edytowanie i aktualizowanie zamówień
-app.get('/edit/:id', orderController.showEditForm);
-app.post('/update/:id', orderController.updateOrder);
+//app.get('/edit/:id', orderController.showEditForm);
+//app.post('/update/:id', orderController.updateOrder);
 
 //wylogowanie
 app.get('/logout', loginController.logout);

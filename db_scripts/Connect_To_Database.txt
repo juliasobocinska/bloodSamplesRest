@@ -1,8 +1,1 @@
-
-
-PGHOST='ep-damp-heart-agput1a1-pooler.c-2.eu-central-1.aws.neon.tech'
-PGDATABASE='blood_samples'
-PGUSER='neondb_owner'
-PGPASSWORD='npg_4Wk2viUhzxpF'
-PGSSLMODE='require'
-PGCHANNELBINDING='require'
+Dane do połaczenia z bazą znajdują się w pliku .env

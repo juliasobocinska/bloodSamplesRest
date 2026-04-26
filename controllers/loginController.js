@@ -89,7 +89,7 @@ const userController = {
             else
                 res.status(401).send(`Nieprawidłowe hasło: ${password}`);
         } else 
-             res.status(404).send(`Brak użytkownika o loginie: ${login}`);
+            res.status(404).send(`Brak użytkownika o loginie: ${login}`);
     }
 }
 

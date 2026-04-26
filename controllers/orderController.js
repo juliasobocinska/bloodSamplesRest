@@ -21,7 +21,7 @@ const orderController = {
                 <a href="/login">ZALOGUJ SIĘ PONOWNIE</a>
                 <a href="/">Wróć na stronę główną</a>`);
         }
- 
+
         //Walidacja by sprawdzić poprawność wieku i ilość próbek
         if (amount < 1) {
             return res.status(400).send('Błąd: Nie możesz zamówić 0 próbek!');

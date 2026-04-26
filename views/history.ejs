@@ -22,8 +22,8 @@
                     <td><%= Array.isArray(z.tests) ? z.tests.join(', ') : z.tests %></td>
                     <td><%= new Date(z.date || z.data).toLocaleDateString() %></td>
                     <td>
-                        <a href="/delete/<%= index %>" onclick="return confirm('Czy na pewno?')">[ Usuń ]</a>
-                        <a href="/edit/<%= index %>">[ Edytuj ]</a>
+                        <a href="/delete/<%= z.id %>" onclick="return confirm('Czy na pewno?')">[ Usuń ]</a>
+                        <a href="/edit/<%= z.id %>">[ Edytuj ]</a>
                     </td>
                 </tr>
             <% }); %>
