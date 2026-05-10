@@ -53,15 +53,42 @@ class Order {
     }
 
     // Usuwanie zamówienia po ID z bazy
-    static async deleteFromDatabase (id) {
+    static async deleteFromDatabase (id, userId) {
         try {
-            await db.query(' DELETE FROM orders WHERE id = $1', [id]);
+            await db.query('DELETE FROM orders WHERE id = $1 AND user_id = $2', [id, userId]);
             console.log(`Order ${id} deleted from Neon.`);
         } catch (err) {
             console.error('Błąd deleteFromDatabase:', err);
+            throw err;
         }
     }
 
+    // Edytowanie zamówienia 
+    static async findById(id) {
+        try {
+            const query = 'SELECT * FROM orders WHERE id = $1';
+            const res = await db.query(query, [id]);
+            return res.rows[0];
+        } catch (err) {
+            console.error('Błąd findByUd', err);
+            throw err;
+        }
+    }
+    // Zapisywanie zmian zamówienia
+    static async updateInDatabase(id, updatedData) {
+        try {
+            const {age, quantity, sample_type} = updatedData;
+            const query = `
+            UPDATE orders
+            SET age = $1, quantity = $2, sample_type = $3
+            WHERE id = $4`;
+            await db.query(query, [age, quantity, sample_type, id]);
+            return true;
+        } catch (err) {
+            console.error('Błąd updateInDatabase:', err);
+            throw err;
+        }
+    }
 }
 
 module.exports = Order;

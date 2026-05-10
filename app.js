@@ -45,8 +45,8 @@ app.get('/history', orderController.showHistory);
 app.get('/delete/:id', orderController.deleteOrder);
 
 //edytowanie i aktualizowanie zamówień
-//app.get('/edit/:id', orderController.showEditForm);
-//app.post('/update/:id', orderController.updateOrder);
+app.get('/edit/:id', orderController.showEditPage);
+app.post('/update/:id', orderController.handleUpdate);
 
 //wylogowanie
 app.get('/logout', loginController.logout);

@@ -1,5 +1,4 @@
 const userModel = require('../models/userModel.sql'); 
-const { handleLogin } = require('./loginController');
 
 const userController = {
 

@@ -57,16 +57,65 @@ const orderController = {
     deleteOrder: async (req, res) => {
         try {
             const orderId = req.params.id;
+            const currentUserId = req.session.userLogin;
             
             // Wywołujemy Twoją nową metodę SQL
-            await Order.deleteFromDatabase(orderId);
+            await Order.deleteFromDatabase(orderId, req.session.userLogin);
             
             res.redirect('/history');
         } catch (error) {
             console.error("Błąd usuwania:", error);
             res.status(500).send("Błąd podczas usuwania zamówienia.");
         }
-    }
+    },
+
+    // EDYTOWANIE ZAMÓWIENIA
+    showEditPage: async (req, res) => {
+        try {
+            const orderId = req.params.id;
+            const order = await Order.findById(orderId);
+
+            if (!order) {
+                return res.status(404).send("Nie znaleziono takiego zamówienia.");
+            }
+
+            if (String(order.user_id) !== String(req.session.userLogin)) {
+                console.log("DEBUG: Brak uprawnień!");
+                console.log("ID właściciela (baza):", order.user_id, typeof order.user_id);
+                console.log("ID zalogowanego (sesja):", req.session.userLogin, typeof req.session.userLogin);
+    
+                return res.status(403).send("Nie masz uprawnień do edycji tego zamówienia.");
+            }
+
+            res.render('edit', {order: order});
+
+        } catch (error) {
+            console.error("Błąd ładowania strony edycji:", error);
+            res.status(500).send("Błąd serwera.");
+        }
+    },
+
+    handleUpdate: async (req, res) => {
+        try {
+            const orderId = req.params.id;
+            const {age, quantity_samples, tests} = req.body;
+
+            const updateOrder = {
+                age: parseInt(age),
+                quantity: parseInt(quantity_samples),
+                sample_type: Array.isArray(tests) ? tests.join(', ') : tests
+            };
+
+            await Order.updateInDatabase(orderId, updateOrder);
+            console.log(`Zamówienie ${orderId} zaktualizowane.`);
+            res.redirect('/history');
+        } catch (error) {
+            console.error("Błąd aktualizacji:", error);
+            res.status(500).send("Błąd podczas zapisywania zmian.");
+
+        }
+    },
+
 };
 
 module.exports = orderController;
