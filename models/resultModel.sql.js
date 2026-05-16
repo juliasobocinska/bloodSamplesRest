@@ -1,4 +1,4 @@
-const db = require('./db');
+const db = require('./db'); // połączenie z Neonem (baza danych)
 
 class resultTests {
     constructor(id, order_id, testName, value, description) {
@@ -14,6 +14,7 @@ class resultTests {
         if (this.testName === "Glukoza") {
             if (this.value < 70) return 'Pozytywny';
             if (this.value > 99) return 'Negatywny, skonsultuj się z lekarzem.';
+            return 'W normie';
         }
 
         if (this.testName === 'Morfologia') {
@@ -28,7 +29,7 @@ class resultTests {
     }
 
 
-    // Zapisanie interpretacji wyniku do bazy danych
+    // Zapisanie wyniku do bazy danych (poprawione SQL)
     static async saveResult(orderId, testName, value) {
         try {
             const tempResult = new resultTests(null, orderId, testName, value);
@@ -36,11 +37,15 @@ class resultTests {
 
             // Tworzymy tymczasowy obiekt, żeby skorzystać z "LOGIKI"
             const query = `
-            INSERT INTO results (order_id, description)
-            VALUES ($1, $2)
-            RETURNING *`
+            INSERT INTO results (order_id, test_name, test_value, description)
+                VALUES ($1, $2, $3, $4)
+                RETURNING *
+            `;
+            const { rows } = await db.query(query, [orderId, testName, value, interpretation]);
+            return rows[0];
         } catch (err) {
-            
+            console.error('Błąd zapisywania wyniku (saveResult):', err);
+            throw err;
         }
     }
 
@@ -51,6 +56,23 @@ class resultTests {
             return res.rows;
         } catch (err) {
             return [];
+        }
+    }
+
+    static async getAllForUser(userId) {
+        try {
+            const query = `
+                SELECT r.*, o.sample_type
+                FROM results r
+                JOIN orders o ON r.order_id = o.id
+                WHERE o.user_id = $1
+                ORDER BY r.uploaded_at DESC
+            `;
+            const { rows } = await db.query(query, [userId]);
+            return rows;
+        } catch (err) {
+            console.error('Błąd getAllForUser:', err);
+            throw err;
         }
     }
 }

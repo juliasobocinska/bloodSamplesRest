@@ -80,9 +80,9 @@ const orderController = {
             }
 
             if (String(order.user_id) !== String(req.session.userLogin)) {
-                console.log("DEBUG: Brak uprawnień!");
-                console.log("ID właściciela (baza):", order.user_id, typeof order.user_id);
-                console.log("ID zalogowanego (sesja):", req.session.userLogin, typeof req.session.userLogin);
+                // console.log("DEBUG: Brak uprawnień!");
+                // console.log("ID właściciela (baza):", order.user_id, typeof order.user_id);
+                // console.log("ID zalogowanego (sesja):", req.session.userLogin, typeof req.session.userLogin);
     
                 return res.status(403).send("Nie masz uprawnień do edycji tego zamówienia.");
             }
