@@ -92,3 +92,13 @@ body {
     border-radius: 8px;
     background-color: #fff0f0;
 }
+
+/* status wyników */
+.status-positive {
+    color: #2e7d32; 
+    background-color: #e8f5e9;
+}
+.status-negative {
+    color: #c62828; 
+    background-color: #ffebee;
+}
