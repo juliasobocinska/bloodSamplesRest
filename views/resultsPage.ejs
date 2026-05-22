@@ -5,7 +5,7 @@
     <h1>Moje Wyniki Badań Laboratoryjnych</h1>
 
     <% if (results && results.length > 0) { %>
-        <table class="results-table">
+        <table class="styled-table">
             <thead>
                 <tr>
                     <th>Data wprowadzenia</th>
@@ -18,16 +18,14 @@
                 <% results.forEach(function(r) { %>
                     <tr>
                         <td><%= new Date(r.uploaded_at).toLocaleString('pl-PL') %></td>
-                        
                         <td><%= r.test_name %></td>
-                        
                         <td><%= r.test_value %></td>
                         
                         <% 
-                            // Przypisujemy odpowiednią klasę CSS w zależności od wyniku
+                            // Przypisujemy klasy CSS, które zaraz dopiszemy do pliku style.css
                             let statusClass = (r.description && r.description.includes('Negatywny')) ? 'status-negative' : 'status-positive'; 
                         %>
-                        <td class="<%= statusClass %>">
+                        <td class="<%= statusClass %>" style="font-weight: bold;">
                             <%= r.description %>
                         </td>
                     </tr>
@@ -35,7 +33,9 @@
             </tbody>
         </table>
     <% } else { %>
-        <p class="empty-results-message">Nie masz jeszcze żadnych dostępnych wyników. Twoje próbki mogą być w trakcie analizy.</p>
+        <div class="message-box text-center">
+            <p>Nie masz jeszcze żadnych dostępnych wyników. Twoje próbki mogą być w trakcie analizy.</p>
+        </div>
     <% } %>
 </div>
 
