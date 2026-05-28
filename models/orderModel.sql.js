@@ -20,6 +20,16 @@ class Order {
         }
     }
 
+    static async getAllOrders (uid) {
+        try {
+            const res = await db.query('SELECT * FROM orders WHERE user_id = ' + uid + ' ORDER BY order_date DESC');
+            return res.rows;
+        }catch (err) {
+            console.error('Błąd getAllOrders:', err);
+            return [];
+        }
+    }
+
     // Dodawanie zamówienia do PostgreSQL
     static async addToDatabase (newObj) {
         try {
@@ -75,14 +85,14 @@ class Order {
         }
     }
     // Zapisywanie zmian zamówienia
-    static async updateInDatabase(id, updatedData) {
+    static async updateInDatabase(id, updatedData, uid) {
         try {
             const {age, quantity, sample_type} = updatedData;
             const query = `
             UPDATE orders
             SET age = $1, quantity = $2, sample_type = $3
-            WHERE id = $4`;
-            await db.query(query, [age, quantity, sample_type, id]);
+            WHERE id = $4 and user_id = $5`;
+            await db.query(query, [age, quantity, sample_type, id, uid]);
             return true;
         } catch (err) {
             console.error('Błąd updateInDatabase:', err);

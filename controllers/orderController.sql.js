@@ -10,15 +10,9 @@ const orderController = {
             if (!userId) {
                 return res.redirect('/login');
             }
+            const orders = await Order.getAllOrders(parseInt(userId)); 
 
-            // Czekamy na dane z bazy (await!)
-            // Możemy pobrać wszystkie zamówienia lub tylko tego użytkownika
-            const orders = await Order.getAllOrders(); 
-            
-            // Filtrowanie możemy zostawić tutaj lub dopisać metodę w modelu SQL
-            const userOrders = orders.filter(o => String(o.user_id) === String(userId));
-
-            res.render('history', { myOrders: userOrders, loggedIn: true});
+            res.render('history', { myOrders: orders, loggedIn: true});
         } catch (error) {
             console.error("Błąd ładowania historii:", error);
             res.status(500).send("Błąd serwera przy pobieraniu historii.");
@@ -32,7 +26,7 @@ const orderController = {
             const owner = req.session.userLogin; // ID zalogowanego użytkownika
 
             if (!owner) {
-                return res.status(401).send("Musisz być zalogowany, aby złożyć zamówienie.");
+                return res.status(401).send("Musisz być zalogowany, aby złożyć zamówienie. <a href=\"/\">Powrót do strony głównej</a>");
             }
 
             const newOrderData = {
@@ -42,10 +36,9 @@ const orderController = {
                 owner: owner
         };
 
-            // Zapisujemy w SQL (await!)
+            // Zapisujemy w SQL
             await Order.addToDatabase(newOrderData);
 
-            console.log("Zamówienie zapisane w chmurze Neon!");
             res.redirect('/history');
         } catch (error) {
             console.error("Błąd składania zamówienia:", error);
@@ -59,8 +52,12 @@ const orderController = {
             const orderId = req.params.id;
             const currentUserId = req.session.userLogin;
             
-            // Wywołujemy Twoją nową metodę SQL
-            await Order.deleteFromDatabase(orderId, req.session.userLogin);
+            if(!currentUserId) {
+                res.status(401).send("Musisz być zalogowany, aby usunąć zamówienie. <a href=\"/\">Powrót do strony głównej</a>")
+                return
+            }
+
+            await Order.deleteFromDatabase(orderId, currentUserId);
             
             res.redirect('/history');
         } catch (error) {
@@ -80,9 +77,6 @@ const orderController = {
             }
 
             if (String(order.user_id) !== String(req.session.userLogin)) {
-                // console.log("DEBUG: Brak uprawnień!");
-                // console.log("ID właściciela (baza):", order.user_id, typeof order.user_id);
-                // console.log("ID zalogowanego (sesja):", req.session.userLogin, typeof req.session.userLogin);
     
                 return res.status(403).send("Nie masz uprawnień do edycji tego zamówienia.");
             }
@@ -99,6 +93,12 @@ const orderController = {
         try {
             const orderId = req.params.id;
             const {age, quantity_samples, tests} = req.body;
+            const uid = req.session.userLogin
+
+            if(!uid) {
+                res.status(401).send("Musisz być zalogowany, aby usunąć zamówienie. <a href=\"/\">Powrót do strony głównej</a>")
+                return
+            }
 
             const updateOrder = {
                 age: parseInt(age),
@@ -106,7 +106,7 @@ const orderController = {
                 sample_type: Array.isArray(tests) ? tests.join(', ') : tests
             };
 
-            await Order.updateInDatabase(orderId, updateOrder);
+            await Order.updateInDatabase(orderId, updateOrder, uid);
             console.log(`Zamówienie ${orderId} zaktualizowane.`);
             res.redirect('/history');
         } catch (error) {

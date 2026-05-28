@@ -14,12 +14,8 @@ const userController = {
             if(login.length > 3 && password.length > 5 && hasNumber) {
                 console.log("[Registration] Login and password validated.");
             } else {
-                return res.status(400).send(`
-                    <script>
-                        alert("Błąd: Login musi mieć min. 4 znaki, a hasło min. 6 znaków i zawierać cyfrę.");
-                        window.location.href = "/register"; // powrót do formularza
-                    </script>
-            `);
+                return res.status(400)
+                    .render('registerPage', {loggedIn: false, err: "Błąd rejestracji: Login musi mieć min. 4 znaki, a hasło min. 6 znaków i zawierać cyfrę."});
             }
 
             //sprawdzenie w bazie czy użytkownik o takim loginie już istnieje
@@ -36,12 +32,7 @@ const userController = {
                 
                 res.status(201).redirect('/login');
             } else {
-                return res.status(409).send(`
-                        <script>
-                            alert("Ten login jest już zajęty.");
-                            window.location.href = "/register";
-                        </script>
-                    `);
+                return res.status(409).render('registerPage', {loggedIn: false, err: "Błąd rejestracji: Ten login jest już zajęty."});
             }
         } catch (error) {
             console.error("Błąd rejestracji:", error);
@@ -61,13 +52,9 @@ const userController = {
             if (existingUser && existingUser.password === password) {
                 // Zapisujemy ID z bazy w sesji
                 req.session.userLogin = existingUser.id;
-                return res.status(200).redirect('/history')
+                return res.redirect('/history')
             } else {
-                return res.status(401).send(`
-                    <script>
-                        alert("Błąd logowania: Nieprawidłowy login lub hasło.");
-                        window.location.href = "/login";
-                    </script>`);
+                return res.status(401).render('loginPage', {loggedIn: false, err: "Błąd logowania: Nieprawidłowy login lub hasło."});
             }
         } catch (error) {
             console.error("Błąd logowania:", error);
@@ -78,7 +65,7 @@ const userController = {
     showLoginPage: (req, res) => {
         if (req.session.userLogin > 0)
             req.redirect('/')
-        res.render('loginPage', {loggedIn: false});
+        res.render('loginPage', {loggedIn: false, err: null});
     },
 
     logout: (req, res) => {
