@@ -1,0 +1,48 @@
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<h1>Zestaw do samodzielnego pobrania krwi</h1>
+    
+<form action="/order" method="POST">
+    <label for="age">Wiek:</label>
+    <input type="number" id="age" name="age" min="18"><br><br>
+
+    <label for="quantity_samples">Ilość próbek:</label>
+    <input type="number" id="quantity_samples" name="quantity_samples" min="1" max="5"><br><br>
+
+    <p>Wybierz badania (max 5):</p>
+    
+    <input type="checkbox" id="thyroid" name="tests" value="Tarczyca">
+    <label for="thyroid">Tarczyca (TSH)</label><br>
+    
+    <input type="checkbox" id="cholesterol" name="tests" value="Cholesterol">
+    <label for="cholesterol">Profil lipidowy (Cholesterol)</label><br>
+    
+    <input type="checkbox" id="morphology" name="tests" value="Morfologia">
+    <label for="morphology">Morfologia pełna</label><br>
+    
+    <input type="checkbox" id="glucose" name="tests" value="Glukoza">
+    <label for="glucose">Glukoza</label><br>
+    
+    <input type="checkbox" id="vitamine_D" name="tests" value="Witamina D">
+    <label for="vitamine_D">Witamina D</label><br>
+    
+    <input type="checkbox" id="blood_diseases" name="tests" value="Choroby krwi">
+    <label for="blood_diseases">Choroby krwi (skaza krwotoczna)</label><br>
+    
+    <input type="checkbox" id="allergies" name="tests" value="Alergie">
+    <label for="allergies">Alergie</label><br>
+    
+    <input type="checkbox" id="blood_type" name="tests" value="Grupa krwi">
+    <label for="blood_type">Grupa krwi</label><br>
+    
+    <input type="checkbox" id="electrolyte_disorders" name="tests" value="Elektrolity">
+    <label for="electrolyte_disorders">Zaburzenia elektrolitowe</label><br>
+    
+    <input type="checkbox" id="anemia" name="tests" value="Anemia">
+    <label for="anemia">Anemia</label><br><br>
+
+    <input type="submit" value="Prześlij">
+</form>
+
+<%- include('partials/footer') %>

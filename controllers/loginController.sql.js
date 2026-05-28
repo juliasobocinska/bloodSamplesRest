@@ -3,16 +3,16 @@ const userModel = require('../models/userModel.sql');
 const userController = {
 
     // REJESTRACJA - Tworzymy nowe konto w bazie SQL
-    handleRegister: async (req, res) => { // Dodano async
+    handleRegister: async (req, res) => {
         try {
             const login = String(req.body.username || "").trim();
             const password = String(req.body.password || "");
-            const full_name = String(req.body.full_name || "Nowy Użytkownik"); // Pobieramy imię
+            const full_name = String(req.body.full_name || "Nowy Użytkownik");
             const hasNumber = /\d/.test(password);
 
             //walidacja loginu i hasła
             if(login.length > 3 && password.length > 5 && hasNumber) {
-                console.log("Login jest poprawny - ma więcej niż 3 znaki. Hasło jest poprawne - ma więcej niż 5 znaków oraz posiada minimum 1 cyfrę.");
+                console.log("[Registration] Login and password validated.");
             } else {
                 return res.status(400).send(`
                     <script>
@@ -22,24 +22,21 @@ const userController = {
             `);
             }
 
-            //sprawdzenie w bazie Neon (z await!) czy użytkownik o takim loginie już istnieje
+            //sprawdzenie w bazie czy użytkownik o takim loginie już istnieje
             const existingUser = await userModel.findUserByLogin(login);
 
             if (!existingUser) {
-                // Nie generujemy już ID przez Date.now() - zrobi to baza (SERIAL)
                 const newUser = {
                     full_name: full_name,
                     login: login,
                     password: password
                 };
 
-                // Zapisujemy w SQL (z await!)
                 await userModel.addToDatabase(newUser);
                 
                 res.status(201).redirect('/login');
             } else {
                 return res.status(409).send(`
-                    return res.status(409).send(
                         <script>
                             alert("Ten login jest już zajęty.");
                             window.location.href = "/register";
@@ -52,7 +49,7 @@ const userController = {
         }
     },
 
-    // LOGOWANIE - Weryfikacja danych z bazy SQL
+    // LOGOWANIE - Weryfikacja danych z bazy
     handleLogin: async (req, res) => { // Dodano async
         try {
             const login = String(req.body.username || "").trim();
@@ -79,7 +76,9 @@ const userController = {
     },
 
     showLoginPage: (req, res) => {
-        res.render('loginPage', {});
+        if (req.session.userLogin > 0)
+            req.redirect('/')
+        res.render('loginPage', {loggedIn: false});
     },
 
     logout: (req, res) => {

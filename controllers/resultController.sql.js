@@ -13,7 +13,7 @@ const resultController = {
             }
             const userResults = await Result.getAllForUser(userId);
 
-            res.render('resultsPage', { results: userResults });
+            res.render('resultsPage', { results: userResults, loggedIn: true });
         } catch (error) {
             console.error("Błąd pobierania wyników:", error);
             res.status(500).send("Wystąpił błąd podczas ładowania wyników.");

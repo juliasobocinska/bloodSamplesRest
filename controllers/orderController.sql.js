@@ -18,7 +18,7 @@ const orderController = {
             // Filtrowanie możemy zostawić tutaj lub dopisać metodę w modelu SQL
             const userOrders = orders.filter(o => String(o.user_id) === String(userId));
 
-            res.render('history', { myOrders: userOrders });
+            res.render('history', { myOrders: userOrders, loggedIn: true});
         } catch (error) {
             console.error("Błąd ładowania historii:", error);
             res.status(500).send("Błąd serwera przy pobieraniu historii.");
@@ -87,7 +87,7 @@ const orderController = {
                 return res.status(403).send("Nie masz uprawnień do edycji tego zamówienia.");
             }
 
-            res.render('edit', {order: order});
+            res.render('edit', {order: order, loggedIn: true});
 
         } catch (error) {
             console.error("Błąd ładowania strony edycji:", error);

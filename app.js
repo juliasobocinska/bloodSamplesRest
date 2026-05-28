@@ -29,11 +29,18 @@ app.post('/order', orderController.handleOrder);
 
 //strona główna
 app.get('/', (req, res) => {
-    res.render('index');
+    res.render('index', {loggedIn: req.session.userLogin > 0});
+});
+
+app.get('/order', (req, res) => {
+    if (req.session.userLogin > 0)
+        res.render('order', {loggedIn: true})
+    else
+        res.redirect('/')
 });
 
 //rejstracja użytkownika
-app.get('/register', (req, res) => res.render('registerPage')); 
+app.get('/register', (req, res) => res.render('registerPage', {loggedIn: false})); 
 app.post('/register', loginController.handleRegister);
 
 //logowanie użytkownika
