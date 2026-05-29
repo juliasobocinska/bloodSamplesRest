@@ -8,14 +8,14 @@ const orderController = {
             const userId = req.session.userLogin;
 
             if (!userId) {
-                return res.redirect('/login');
+                return res.status(401).send({status:401});
             }
             const orders = await Order.getAllOrders(parseInt(userId)); 
 
-            res.render('history', { myOrders: orders, loggedIn: true});
+            res.send({ status: 200, payload: orders});
         } catch (error) {
             console.error("Błąd ładowania historii:", error);
-            res.status(500).send("Błąd serwera przy pobieraniu historii.");
+            res.status(500).send({status:500});
         }
     },
 
@@ -26,7 +26,7 @@ const orderController = {
             const owner = req.session.userLogin; // ID zalogowanego użytkownika
 
             if (!owner) {
-                return res.status(401).send("Musisz być zalogowany, aby złożyć zamówienie. <a href=\"/\">Powrót do strony głównej</a>");
+                return res.status(401).send({status:401});
             }
 
             const newOrderData = {
@@ -39,10 +39,10 @@ const orderController = {
             // Zapisujemy w SQL
             await Order.addToDatabase(newOrderData);
 
-            res.redirect('/history');
+            res.status(201).send({status:201});
         } catch (error) {
             console.error("Błąd składania zamówienia:", error);
-            res.status(500).send("Nie udało się zapisać zamówienia.");
+            res.status(500).send({status:500});
         }
     },
 
@@ -53,7 +53,7 @@ const orderController = {
             const currentUserId = req.session.userLogin;
             
             if(!currentUserId) {
-                res.status(401).send("Musisz być zalogowany, aby usunąć zamówienie. <a href=\"/\">Powrót do strony głównej</a>")
+                res.status(401).send({status:401})
                 return
             }
 
@@ -62,7 +62,7 @@ const orderController = {
             res.redirect('/history');
         } catch (error) {
             console.error("Błąd usuwania:", error);
-            res.status(500).send("Błąd podczas usuwania zamówienia.");
+            res.status(500).send({status:500});
         }
     },
 
@@ -73,19 +73,19 @@ const orderController = {
             const order = await Order.findById(orderId);
 
             if (!order) {
-                return res.status(404).send("Nie znaleziono takiego zamówienia.");
+                return res.status(404).send({status:404});
             }
 
             if (String(order.user_id) !== String(req.session.userLogin)) {
     
-                return res.status(403).send("Nie masz uprawnień do edycji tego zamówienia.");
+                return res.status(403).send({status:403});
             }
 
             res.render('edit', {order: order, loggedIn: true});
 
         } catch (error) {
             console.error("Błąd ładowania strony edycji:", error);
-            res.status(500).send("Błąd serwera.");
+            res.status(500).send({status:500});
         }
     },
 
@@ -96,7 +96,7 @@ const orderController = {
             const uid = req.session.userLogin
 
             if(!uid) {
-                res.status(401).send("Musisz być zalogowany, aby usunąć zamówienie. <a href=\"/\">Powrót do strony głównej</a>")
+                res.status(401).send({status:401})
                 return
             }
 
@@ -108,10 +108,10 @@ const orderController = {
 
             await Order.updateInDatabase(orderId, updateOrder, uid);
             console.log(`Zamówienie ${orderId} zaktualizowane.`);
-            res.redirect('/history');
+            res.status(204).send(204);
         } catch (error) {
             console.error("Błąd aktualizacji:", error);
-            res.status(500).send("Błąd podczas zapisywania zmian.");
+            res.status(500).send({status:500});
 
         }
     },

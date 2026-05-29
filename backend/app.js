@@ -26,36 +26,20 @@ app.use(express.urlencoded({ extended: true }));
 
 //strona główna
 app.get('/', (req, res) => {
-    res.render('index', {loggedIn: req.session.userLogin > 0});
+    res.send({status: 200});
 });
 
-//obsługa zamówień
-app.post('/order', orderController.handleOrder);
-app.get('/order', (req, res) => {
-    if (req.session.userLogin > 0)
-        res.render('order', {loggedIn: true})
-    else
-        res.redirect('/')
-});
-
-//rejstracja użytkownika
-app.get('/register', (req, res) => res.render('registerPage', {loggedIn: false, err:null})); 
+//rejstracja użytkownika 
 app.post('/register', loginController.handleRegister);
 
 //logowanie użytkownika
-app.get('/login', loginController.showLoginPage);
 app.post('/login', loginController.handleLogin);
 
-//historia i usuwanie zamówień
-app.get('/history', orderController.showHistory); 
-app.get('/delete/:id', orderController.deleteOrder);
-
-//edytowanie i aktualizowanie zamówień
-app.get('/edit/:id', orderController.showEditPage);
-app.post('/update/:id', orderController.handleUpdate);
-
-//wylogowanie
-app.get('/logout', loginController.logout);
+// CRUD in order
+app.post('/orders', orderController.handleOrder);
+app.get('/orders', orderController.showHistory); 
+app.patch('/orders/:id', orderController.showEditPage);
+app.delete('/orders/:id', orderController.deleteOrder);
 
 // Widok wyników pacjenta
 app.get('/results', resultController.showMyResults);

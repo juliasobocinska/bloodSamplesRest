@@ -15,7 +15,7 @@ const userController = {
                 console.log("[Registration] Login and password validated.");
             } else {
                 return res.status(400)
-                    .render('registerPage', {loggedIn: false, err: "Błąd rejestracji: Login musi mieć min. 4 znaki, a hasło min. 6 znaków i zawierać cyfrę."});
+                    .send({status: 400});
             }
 
             //sprawdzenie w bazie czy użytkownik o takim loginie już istnieje
@@ -30,13 +30,13 @@ const userController = {
 
                 await userModel.addToDatabase(newUser);
                 
-                res.status(201).redirect('/login');
+                res.status(201).send({status: 201});;
             } else {
-                return res.status(409).render('registerPage', {loggedIn: false, err: "Błąd rejestracji: Ten login jest już zajęty."});
+                return res.status(409).send({status: 409});
             }
         } catch (error) {
             console.error("Błąd rejestracji:", error);
-            return res.status(500).send("Wystąpił błąd serwera przy rejestracji.");
+            return res.status(500).send({status: 500});
         }
     },
 
@@ -52,26 +52,15 @@ const userController = {
             if (existingUser && existingUser.password === password) {
                 // Zapisujemy ID z bazy w sesji
                 req.session.userLogin = existingUser.id;
-                return res.redirect('/history')
+                return res.send({status: 200});
             } else {
-                return res.status(401).render('loginPage', {loggedIn: false, err: "Błąd logowania: Nieprawidłowy login lub hasło."});
+                return res.status(401).send({status: 401});
             }
         } catch (error) {
             console.error("Błąd logowania:", error);
-            res.status(500).send("Błąd serwera.");
+            res.status(500).send({status: 500});
         }
     },
-
-    showLoginPage: (req, res) => {
-        if (req.session.userLogin > 0)
-            req.redirect('/')
-        res.render('loginPage', {loggedIn: false, err: null});
-    },
-
-    logout: (req, res) => {
-        req.session.destroy();
-        res.redirect('/login');
-    }
 }
 
 module.exports = userController;

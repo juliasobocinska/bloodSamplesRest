@@ -9,14 +9,14 @@ const resultController = {
             const userId = req.session.userLogin;
 
             if (!userId) {
-                return res.status(401).send("Musisz być zalogowany, aby zobaczyć wyniki.");
+                return res.status(401).send({status:401});
             }
             const userResults = await Result.getAllForUser(userId);
 
-            res.render('resultsPage', { results: userResults, loggedIn: true });
+            res.send({status:200, payload: userResults });
         } catch (error) {
             console.error("Błąd pobierania wyników:", error);
-            res.status(500).send("Wystąpił błąd podczas ładowania wyników.");
+            res.status(500).send({status:500});
         }
     },
 
@@ -28,11 +28,11 @@ const resultController = {
             await Result.saveResult(orderId, testName, parseFloat(value));
 
             console.log(`Zapisano nowy wynik dla zamówienia nr ${orderId}`);
-            res.redirect('/results');
+            res.status(201).send({status:201});
 
         } catch (error) {
             console.error("Błąd zapisywania wyniku:", error);
-            res.status(500).send("Nie udało się zapisać wyniku.");
+            res.status(500).send({status:500});
         }
     }
 }
