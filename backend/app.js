@@ -6,6 +6,7 @@ const port = 5000;
 const orderController = require('./controllers/orderController.sql.js'); // test nowego kontrolera
 const loginController = require('./controllers/loginController.sql.js'); // test nowego kontrolera
 const resultController = require('./controllers/resultController.sql.js'); // nowy kontroler wykików
+const currencyController = require('./controllers/currencyController.js');
 const session = require('express-session');
 require('./models/db');
 app.use(express.json());
@@ -89,6 +90,9 @@ app.delete('/orders/:id', verifyToken, orderController.deleteOrder);     // Usuw
 // Wyniki badań (Chronione)
 app.get('/results', verifyToken, resultController.showMyResults);        // Pacjent sprawdza wyniki (GET)
 app.post('/results', verifyToken, resultController.generateResult);      // Laborant dodaje wynik (POST)
+
+// Publiczny cennik z przelicznikiem walut NBP
+app.get('/pricelist/:code', currencyController.getPriceListInCurrency);
 
 // --- URUCHOMIENIE SERWERA ---
 app.listen(port, () => {
