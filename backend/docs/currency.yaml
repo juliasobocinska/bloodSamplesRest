@@ -1,0 +1,20 @@
+paths:
+  /pricelist/{code}:
+    get:
+      summary: Dynamiczny cennik badań w obcej walucie
+      description: Pobiera aktualny kurs z NBP i przelicza domyślny cennik laboratoryjny.
+      tags: 
+        - Cennik i Finanse
+      parameters:
+        - in: path
+          name: code
+          required: true
+          schema:
+            type: string
+            example: EUR
+          description: Trzyliterowy kod waluty (np. EUR, USD, GBP, CHF)
+      responses:
+        '200':
+          description: Przeliczony cennik.
+        '404':
+          description: Błędny kod waluty.
