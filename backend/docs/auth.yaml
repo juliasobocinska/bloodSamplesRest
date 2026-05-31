@@ -1,0 +1,55 @@
+paths:
+  /register:
+    post:
+      summary: Rejestracja użytkownika
+      description: Tworzy nowe konto w systemie.
+      tags: 
+        - Autoryzacja
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: nowypacjent
+                password:
+                  type: string
+                  example: tajnehaslo123
+                full_name:
+                  type: string
+                  example: Jan Kowalski
+      responses:
+        '201':
+          description: Konto utworzone pomyślnie.
+        '400':
+          description: Błąd walidacji danych.
+        '409':
+          description: Login już zajęty.
+
+  /login:
+    post:
+      summary: Logowanie użytkownika
+      description: Zwraca token JWT po podaniu prawidłowego loginu i hasła.
+      tags: 
+        - Autoryzacja
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: tester
+                password:
+                  type: string
+                  example: haslotestera1
+      responses:
+        '200':
+          description: Zalogowano pomyślnie. Zwraca token JWT.
+        '401':
+          description: Nieprawidłowy login lub hasło.

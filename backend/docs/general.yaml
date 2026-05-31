@@ -1,0 +1,10 @@
+paths:
+  /:
+    get:
+      summary: Strona główna API
+      description: Zwraca status działania serwera.
+      tags: 
+        - Ogólne
+      responses:
+        '200':
+          description: API działa poprawnie.
