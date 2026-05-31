@@ -1,5 +1,6 @@
 // --- IMPORTY MODUŁÓW ---
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const port = 5000;
 const orderController = require('./controllers/orderController.sql.js'); // test nowego kontrolera
@@ -60,7 +61,7 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 //----------------------------------------------
 
-
+app.use(cors());
 
 // --- KONFIGURACJA PARSOWANIA DANYCH ---
 app.use(express.json()); 
