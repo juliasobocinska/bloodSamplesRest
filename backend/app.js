@@ -15,45 +15,41 @@ app.use(cors({
     credentials: true 
 }));
 
-//konfiguracja silnika widoków
-app.set('view engine', 'ejs');
+// Importujemy nasz middleware (JWT)
+const verifyToken = require('./middleware/auth');
 
-//konfiguracja sesji
-app.use(session({
-  secret: 'tajny_klucz_098', 
-  resave: false,
-  saveUninitialized: false,
-  cookie: { secure: false, sameSite: 'lax' }
-}));
+require('./models/db'); // połączenie z bazą
 
-//parsowanie danych
+// parsowanie danych (niezbędne do odbierania JSON z Frontendu)
 app.use(express.json()); 
-app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 
-//strona główna
+
+// --- ŚCIEŻKI REST API ---
+
+// strona główna (zwraca testowy JSON)
 app.get('/', (req, res) => {
-    res.send({status: 200});
+    res.status(200).json({ message: "API działa poprawnie" });
 });
 
-//rejstracja użytkownika 
+// Rejestracja i logowanie (Publiczne - każdy ma dostęp)
 app.post('/register', loginController.handleRegister);
-
-//logowanie użytkownika
 app.post('/login', loginController.handleLogin);
 
-// CRUD in order
-app.post('/orders', orderController.handleOrder);
-app.get('/orders', orderController.showHistory); 
-app.patch('/orders/:id', orderController.showEditPage);
-app.delete('/orders/:id', orderController.deleteOrder);
+// CRUD ZAMÓWIEŃ (Chronione przez verifyToken - trzeba być zalogowanym)
+app.post('/orders', verifyToken, orderController.handleOrder);           // Tworzenie (POST)
+app.get('/orders', verifyToken, orderController.showHistory);            // Pobieranie wszystkich (GET)
+app.get('/orders/:id', verifyToken, orderController.getOrderById);       // Pobieranie pojedynczego do edycji (GET)
+app.put('/orders/:id', verifyToken, orderController.handleUpdate);       // Aktualizacja (PUT)
+app.delete('/orders/:id', verifyToken, orderController.deleteOrder);     // Usuwanie (DELETE)
 
-// Widok wyników pacjenta
-app.get('/results', resultController.showMyResults);
+// WYNIKI BADAŃ (Chronione)
+app.get('/results', verifyToken, resultController.showMyResults);        // Pacjent sprawdza wyniki (GET)
+app.post('/results', verifyToken, resultController.generateResult);      // Laborant dodaje wynik (POST)
 
-
-//uruchomienie serwera
-app.listen(5000, () => {
-  console.log(`CenterLab app listening on port ${5000}!`)
+// uruchomienie serwera
+app.listen(port, () => {
+  console.log(`CenterLab API listening on port ${port}!`)
 });
+
 

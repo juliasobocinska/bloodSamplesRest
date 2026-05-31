@@ -1,20 +1,16 @@
 const Order = require('../models/orderModel.sql');
 
 const orderController = {
-    // WYŚWIETLANIE HISTORII - Pobieranie danych z Neona
+    // 1. POBIERANIE HISTORII ZAMÓWIEN (GET)
     showHistory: async (req, res) => {
         try {
-            const userId = req.query.userId || req.body.userId;
+            const userId = req.user.id;
+            const orders = await Order.getAllOrders(userId);
+            return res.status(200).json({ orders: orders });
 
-            if (!userId) {
-                return res.status(401).send({status:401});
-            }
-            const orders = await Order.getAllOrders(parseInt(userId)); 
-
-            res.send({ status: 200, payload: orders});
         } catch (error) {
             console.error("Błąd ładowania historii:", error);
-            res.status(500).send({status:500});
+            return res.status(500).json({ error: "Błąd serwera podczas pobierania historii." });
         }
     },
 
@@ -50,17 +46,17 @@ const orderController = {
                 created_at: new Date()
         };
 
-            // Zapisujemy w SQL
             await Order.addToDatabase(newOrderData);
+            return res.status(201).json({ message: "Zamówienie zostało utworzone pomyślnie." }); 
 
             res.status(201).send({status:201, payload: newOrderData});
         } catch (error) {
             console.error("Błąd składania zamówienia:", error);
-            res.status(500).send({status:500});
+            return res.status(500).json({ error: "Błąd serwera podczas składania zamówienia." });
         }
     },
 
-    // USUWANIE ZAMÓWIENIA
+    // 3. USUWANIE ZAMÓWIENIA (DELETE)
     deleteOrder: async (req, res) => {
         try {
             const orderId = req.params.id;
@@ -76,18 +72,18 @@ const orderController = {
             res.status(200).send({status: 200});
         } catch (error) {
             console.error("Błąd usuwania:", error);
-            res.status(500).send({status:500});
+            return res.status(500).json({ error: "Błąd serwera podczas usuwania zamówienia." });
         }
     },
 
-    // EDYTOWANIE ZAMÓWIENIA
-    showEditPage: async (req, res) => {
+    // 4. POBIERANIE DANYCH ZAMÓWIENIA DO EDYCJI (GET)
+    getOrderById: async (req, res) => {
         try {
             const orderId = req.params.id;
             const order = await Order.findById(orderId);
 
             if (!order) {
-                return res.status(404).send({status:404});
+                return res.status(404).json({ error: "Nie znaleziono zamówienia." });
             }
 
             const currentUserId = req.query.userId || req.body.userId;
@@ -111,10 +107,11 @@ const orderController = {
 
         } catch (error) {
             console.error("Błąd ładowania strony edycji:", error);
-            res.status(500).send({status:500});
+            return res.status(500).json({ error: "Błąd serwera." });
         }
     },
 
+    // 5. AKTUALIZACJA ZAMÓWIENIA (PUT)
     handleUpdate: async (req, res) => {
         try {
             const orderId = req.params.id;
@@ -137,7 +134,7 @@ const orderController = {
             res.sendStatus(204);
         } catch (error) {
             console.error("Błąd aktualizacji:", error);
-            res.status(500).send({status:500});
+            return res.status(500).json({ error: "Błąd podczas aktualizacji." });
 
         }
     },
