@@ -1,0 +1,118 @@
+paths:
+  /orders:
+    get:
+      summary: Pobieranie historii zamówień
+      description: Zwraca listę wszystkich zamówień zalogowanego pacjenta.
+      tags: 
+        - Zamówienia
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista zamówień.
+        '401':
+          description: Brak autoryzacji (brak tokena).
+          
+    post:
+      summary: Składanie nowego zamówienia
+      description: Dodaje nowe zamówienie na badanie krwi.
+      tags: 
+        - Zamówienia
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                age:
+                  type: integer
+                  example: 30
+                quantity_samples:
+                  type: integer
+                  example: 2
+                tests:
+                  type: array
+                  items:
+                    type: string
+                  example: ["Glukoza", "Morfologia"]
+      responses:
+        '201':
+          description: Zamówienie zostało utworzone.
+        '401':
+          description: Brak autoryzacji.
+
+  /orders/{id}:
+    get:
+      summary: Pobieranie konkretnego zamówienia
+      description: Zwraca dane zamówienia do edycji (tylko dla właściciela).
+      tags: 
+        - Zamówienia
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID zamówienia w bazie
+      responses:
+        '200':
+          description: Dane zamówienia.
+        '404':
+          description: Nie znaleziono zamówienia.
+          
+    put:
+      summary: Aktualizacja zamówienia
+      description: Nadpisuje dane w istniejącym zamówieniu.
+      tags: 
+        - Zamówienia
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                age:
+                  type: integer
+                  example: 31
+                quantity_samples:
+                  type: integer
+                  example: 1
+                tests:
+                  type: array
+                  items:
+                    type: string
+                  example: ["Cholesterol"]
+      responses:
+        '200':
+          description: Zamówienie zaktualizowane poprawnie.
+          
+    delete:
+      summary: Usuwanie zamówienia
+      description: Trwale usuwa zamówienie z bazy danych.
+      tags: 
+        - Zamówienia
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Zamówienie zostało usunięte.

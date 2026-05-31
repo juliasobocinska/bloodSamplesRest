@@ -1,0 +1,39 @@
+paths:
+  /results:
+    get:
+      summary: Pobieranie wyników badań
+      description: Zwraca wyniki przypisane do zalogowanego pacjenta.
+      tags: 
+        - Wyniki
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista wyników badań.
+          
+    post:
+      summary: Dodawanie wyniku badania (Laborant)
+      description: Zapisuje nowy wynik do bazy i generuje interpretację.
+      tags: 
+        - Wyniki
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orderId:
+                  type: integer
+                  example: 5
+                testName:
+                  type: string
+                  example: Glukoza
+                value:
+                  type: number
+                  example: 85.5
+      responses:
+        '201':
+          description: Zapisano nowy wynik.

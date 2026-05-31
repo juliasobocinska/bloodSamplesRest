@@ -1,26 +1,71 @@
-//importowanie modułów
+// --- IMPORTY MODUŁÓW ---
 const express = require('express');
 const app = express();
 const port = 3000;
 
-// Importujemy nasz middleware (JWT)
+// --- IMPORTY MIDDLEWARE I BAZY DANYCH ---
 const verifyToken = require('./middleware/auth');
+require('./models/db'); // połączenie z bazą
 
-// Importujemy kontrolery
+
+// --- IMPORTY KONTROLERÓW ---
 const orderController = require('./controllers/orderController.sql.js'); 
 const loginController = require('./controllers/loginController.sql.js'); 
 const resultController = require('./controllers/resultController.sql.js'); 
 
-require('./models/db'); // połączenie z bazą
 
-// parsowanie danych (niezbędne do odbierania JSON z Frontendu)
+
+//----------------------------------------------
+// --- IMPORTY I KONFIGURACJA SWAGGERA ---
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsDoc = require('swagger-jsdoc');
+
+// --- KONFIGURACJA SWAGGERA ---
+const swaggerOptions = {
+    definition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'CenterLab API',
+            version: '1.0.0',
+            description: 'Dokumentacja REST API dla systemu obsługi badań krwi',
+        },
+        servers: [
+            {
+                url: 'http://localhost:3000',
+                description: 'Serwer lokalny'
+            },
+        ],
+        components: {
+            securitySchemes: {
+                bearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT',
+                }
+            }
+        },
+        security: [{
+            bearerAuth: []
+        }],
+    },
+    // Pliki, w których Swagger ma szukać komentarzy z dokumentacją
+    apis: ['./docs/*.yaml'], 
+};
+
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+//----------------------------------------------
+
+
+
+// --- KONFIGURACJA PARSOWANIA DANYCH ---
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
 
 
 // --- ŚCIEŻKI REST API ---
 
-// strona główna (zwraca testowy JSON)
+
 app.get('/', (req, res) => {
     res.status(200).json({ message: "API działa poprawnie" });
 });
@@ -29,18 +74,18 @@ app.get('/', (req, res) => {
 app.post('/register', loginController.handleRegister);
 app.post('/login', loginController.handleLogin);
 
-// CRUD ZAMÓWIEŃ (Chronione przez verifyToken - trzeba być zalogowanym)
+// CRUD Zamówień (Chronione przez verifyToken - trzeba być zalogowanym)
 app.post('/orders', verifyToken, orderController.handleOrder);           // Tworzenie (POST)
 app.get('/orders', verifyToken, orderController.showHistory);            // Pobieranie wszystkich (GET)
 app.get('/orders/:id', verifyToken, orderController.getOrderById);       // Pobieranie pojedynczego do edycji (GET)
 app.put('/orders/:id', verifyToken, orderController.handleUpdate);       // Aktualizacja (PUT)
 app.delete('/orders/:id', verifyToken, orderController.deleteOrder);     // Usuwanie (DELETE)
 
-// WYNIKI BADAŃ (Chronione)
+// Wyniki badań (Chronione)
 app.get('/results', verifyToken, resultController.showMyResults);        // Pacjent sprawdza wyniki (GET)
 app.post('/results', verifyToken, resultController.generateResult);      // Laborant dodaje wynik (POST)
 
-// uruchomienie serwera
+// --- URUCHOMIENIE SERWERA ---
 app.listen(port, () => {
   console.log(`CenterLab API listening on port ${port}!`)
 });
