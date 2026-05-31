@@ -10,21 +10,23 @@ class Order {
     }
 
     // Pobieranie wszystkich zamówień z bazy
-    static async getAllOrders () {
+    static async getAllOrders (userId = null) {
         try {
-            const res = await db.query('SELECT * FROM orders ORDER BY order_date DESC');
-            return res.rows;
-        }catch (err) {
-            console.error('Błąd getAllOrders:', err);
-            return [];
-        }
-    }
+            let query = '';
+            let params = [];
 
-    static async getAllOrders (uid) {
-        try {
-            const res = await db.query('SELECT * FROM orders WHERE user_id = ' + uid + ' ORDER BY order_date DESC');
+            if (userId) {
+                // Jeśli podano ID, szukamy zamówień tylko tego użytkownika
+                query = 'SELECT * FROM orders WHERE user_id = $1 ORDER BY order_date DESC';
+                params = [userId];
+            } else {
+                // W przeciwnym razie pobieramy wszystko (np. dla panelu admina)
+                query = 'SELECT * FROM orders ORDER BY order_date DESC';
+            }
+
+            const res = await db.query(query, params);
             return res.rows;
-        }catch (err) {
+        } catch (err) {
             console.error('Błąd getAllOrders:', err);
             return [];
         }
@@ -56,7 +58,7 @@ class Order {
             LIMIT 1`;
 
             const res = await db.query(query, [userId]);
-            return res.rows || null;
+            return res.rows[0] || null;
         } catch (err) {
             return null;
         }

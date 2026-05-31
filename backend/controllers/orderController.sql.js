@@ -1,104 +1,84 @@
 const Order = require('../models/orderModel.sql');
 
 const orderController = {
-    // WYŚWIETLANIE HISTORII - Pobieranie danych z Neona
+    // 1. POBIERANIE HISTORII ZAMÓWIEN (GET)
     showHistory: async (req, res) => {
         try {
-            // Pobieramy ID użytkownika z sesji (ustawione przy logowaniu)
-            const userId = req.session.userLogin;
+            const userId = req.user.id;
+            const orders = await Order.getAllOrders(userId);
+            return res.status(200).json({ orders: orders });
 
-            if (!userId) {
-                return res.status(401).send({status:401});
-            }
-            const orders = await Order.getAllOrders(parseInt(userId)); 
-
-            res.send({ status: 200, payload: orders});
         } catch (error) {
             console.error("Błąd ładowania historii:", error);
-            res.status(500).send({status:500});
+            return res.status(500).json({ error: "Błąd serwera podczas pobierania historii." });
         }
     },
 
-    // SKŁADANIE ZAMÓWIENIA - Zapis do tabeli orders
+    // 2. SKŁADANIE ZAMÓWIENIA (POST)
     handleOrder: async (req, res) => {
         try {
             const { age, quantity_samples, tests } = req.body;
-            const owner = req.session.userLogin; // ID zalogowanego użytkownika
-
-            if (!owner) {
-                return res.status(401).send({status:401});
-            }
+            const owner = req.user.id;
 
             const newOrderData = {
                 age: parseInt(age) || 0,
                 quantity: parseInt(quantity_samples) || 1, 
                 tests: Array.isArray(tests) ? tests.join(', ') : (tests || "Brak badań"),
                 owner: owner
-        };
+            };
 
-            // Zapisujemy w SQL
             await Order.addToDatabase(newOrderData);
+            return res.status(201).json({ message: "Zamówienie zostało utworzone pomyślnie." }); 
 
-            res.status(201).send({status:201});
         } catch (error) {
             console.error("Błąd składania zamówienia:", error);
-            res.status(500).send({status:500});
+            return res.status(500).json({ error: "Błąd serwera podczas składania zamówienia." });
         }
     },
 
-    // USUWANIE ZAMÓWIENIA
+    // 3. USUWANIE ZAMÓWIENIA (DELETE)
     deleteOrder: async (req, res) => {
         try {
             const orderId = req.params.id;
-            const currentUserId = req.session.userLogin;
-            
-            if(!currentUserId) {
-                res.status(401).send({status:401})
-                return
-            }
+            const currentUserId = req.user.id;
 
             await Order.deleteFromDatabase(orderId, currentUserId);
-            
-            res.redirect('/history');
+            return res.status(200).json({ message: `Zamówienie o ID ${orderId} zostało usunięte.` });
+
         } catch (error) {
             console.error("Błąd usuwania:", error);
-            res.status(500).send({status:500});
+            return res.status(500).json({ error: "Błąd serwera podczas usuwania zamówienia." });
         }
     },
 
-    // EDYTOWANIE ZAMÓWIENIA
-    showEditPage: async (req, res) => {
+    // 4. POBIERANIE DANYCH ZAMÓWIENIA DO EDYCJI (GET)
+    getOrderById: async (req, res) => {
         try {
             const orderId = req.params.id;
             const order = await Order.findById(orderId);
 
             if (!order) {
-                return res.status(404).send({status:404});
+                return res.status(404).json({ error: "Nie znaleziono zamówienia." });
             }
 
-            if (String(order.user_id) !== String(req.session.userLogin)) {
-    
-                return res.status(403).send({status:403});
+            if (String(order.user_id) !== String(req.user.id)) {
+                return res.status(403).json({ error: "Brak uprawnień do podglądu tego zamówienia." });
             }
 
-            res.render('edit', {order: order, loggedIn: true});
+            return res.status(200).json({ order: order });
 
         } catch (error) {
             console.error("Błąd ładowania strony edycji:", error);
-            res.status(500).send({status:500});
+            return res.status(500).json({ error: "Błąd serwera." });
         }
     },
 
+    // 5. AKTUALIZACJA ZAMÓWIENIA (PUT)
     handleUpdate: async (req, res) => {
         try {
             const orderId = req.params.id;
             const {age, quantity_samples, tests} = req.body;
-            const uid = req.session.userLogin
-
-            if(!uid) {
-                res.status(401).send({status:401})
-                return
-            }
+            const uid = req.user.id;
 
             const updateOrder = {
                 age: parseInt(age),
@@ -108,10 +88,11 @@ const orderController = {
 
             await Order.updateInDatabase(orderId, updateOrder, uid);
             console.log(`Zamówienie ${orderId} zaktualizowane.`);
-            res.status(204).send(204);
+            return res.status(200).json({ message: "Zamówienie zaktualizowane poprawnie." });
+
         } catch (error) {
             console.error("Błąd aktualizacji:", error);
-            res.status(500).send({status:500});
+            return res.status(500).json({ error: "Błąd podczas aktualizacji." });
 
         }
     },

@@ -1,8 +1,10 @@
 const userModel = require('../models/userModel.sql'); 
+const jwt = require('jsonwebtoken'); // Niezbędna biblioteka do JWT
+require('dotenv').config(); // Ładowanie klucza JWT z pliku .env
 
 const userController = {
 
-    // REJESTRACJA - Tworzymy nowe konto w bazie SQL
+    // REJESTRACJA - Tworzymy nowe konto i zwracamy JSON
     handleRegister: async (req, res) => {
         try {
             const login = String(req.body.username || "").trim();
@@ -11,14 +13,13 @@ const userController = {
             const hasNumber = /\d/.test(password);
 
             //walidacja loginu i hasła
-            if(login.length > 3 && password.length > 5 && hasNumber) {
-                console.log("[Registration] Login and password validated.");
-            } else {
-                return res.status(400)
-                    .send({status: 400});
+            if(!(login.length > 3 && password.length > 5 && hasNumber)) {
+                return res.status(400).json({ 
+                    error: "Login musi mieć min. 4 znaki, a hasło min. 6 znaków i zawierać cyfrę." 
+                });
             }
 
-            //sprawdzenie w bazie czy użytkownik o takim loginie już istnieje
+            // Sprawdzenie czy użytkownik już istnieje
             const existingUser = await userModel.findUserByLogin(login);
 
             if (!existingUser) {
@@ -30,18 +31,19 @@ const userController = {
 
                 await userModel.addToDatabase(newUser);
                 
-                res.status(201).send({status: 201});;
+                return res.status(201).json({ message: "Konto utworzone pomyślnie." });
             } else {
-                return res.status(409).send({status: 409});
+                return res.status(409).json({ error: "Ten login jest już zajęty." });
             }
+
         } catch (error) {
             console.error("Błąd rejestracji:", error);
-            return res.status(500).send({status: 500});
+            return res.status(500).json({ error: "Wystąpił błąd serwera przy rejestracji." });
         }
     },
 
-    // LOGOWANIE - Weryfikacja danych z bazy
-    handleLogin: async (req, res) => { // Dodano async
+    // LOGOWANIE - Weryfikacja danych i generowanie tokena JWT
+    handleLogin: async (req, res) => {
         try {
             const login = String(req.body.username || "").trim();
             const password = String(req.body.password);
@@ -49,16 +51,31 @@ const userController = {
             //sprawdzamy czy użytkownik o danym loginie istnieje bazie
             const existingUser = await userModel.findUserByLogin(login);
 
+            // Jeśli użytkownik istnieje i hasła się zgadzają
             if (existingUser && existingUser.password === password) {
-                // Zapisujemy ID z bazy w sesji
-                req.session.userLogin = existingUser.id;
-                return res.send({status: 200});
+                // Generowanie Tokena JWT
+                const token = jwt.sign(
+                    { id: existingUser.id, login: existingUser.login }, // Dane zaszyfrowane w tokenie (payload)
+                    process.env.JWT_SECRET || 'awaryjny_klucz_dla_dev', // Klucz szyfrujący
+                    { expiresIn: '2h' }                                 // Token wygaśnie po 2 godzinach
+                );
+
+                // Odsyłamy token i dane użytkownika do FrontEndu
+                return res.status(200).json({ 
+                    message: "Zalogowano pomyślnie",
+                    token: token,
+                    user: { 
+                        id: existingUser.id, 
+                        name: existingUser.full_name 
+                    }
+                });
+
             } else {
-                return res.status(401).send({status: 401});
+                return res.status(401).json({ error: "Nieprawidłowy login lub hasło." });
             }
         } catch (error) {
             console.error("Błąd logowania:", error);
-            res.status(500).send({status: 500});
+            return res.status(500).json({ error: "Wystąpił błąd serwera." });
         }
     },
 }

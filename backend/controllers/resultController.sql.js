@@ -1,38 +1,34 @@
 const Result = require('../models/resultModel.sql.js');
-const Order = require('../models/orderModel.sql.js');
 
 const resultController = {
 
-    // 1. Wyświetlenie wyników dla zalogowanego pacjenta
+    // 1. Pobieranie wyników dla pacjenta (GET)
     showMyResults: async (req, res) => {
         try {
-            const userId = req.session.userLogin;
+            const userId = req.user.id;
 
-            if (!userId) {
-                return res.status(401).send({status:401});
-            }
             const userResults = await Result.getAllForUser(userId);
+            return res.status(200).json({ results: userResults });
 
-            res.send({status:200, payload: userResults });
         } catch (error) {
             console.error("Błąd pobierania wyników:", error);
-            res.status(500).send({status:500});
+            return res.status(500).json({ error: "Błąd pobierania wyników." });
         }
     },
 
-    // 2. Laborant dodaje wynik (np. przez formularz)
+    // 2. Dodawanie wyniku przez laboranta (POST)
     generateResult: async (req, res) => {
         try {
             const {orderId, testName, value} = req.body;
 
             await Result.saveResult(orderId, testName, parseFloat(value));
-
             console.log(`Zapisano nowy wynik dla zamówienia nr ${orderId}`);
-            res.status(201).send({status:201});
+
+            return res.status(201).json({ message: `Zapisano nowy wynik dla zamówienia nr ${orderId}` });
 
         } catch (error) {
             console.error("Błąd zapisywania wyniku:", error);
-            res.status(500).send({status:500});
+            return res.status(500).json({ error: "Nie udało się zapisać wyniku." });
         }
     }
 }
