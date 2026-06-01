@@ -14,8 +14,7 @@ const userController = {
             if(login.length > 3 && password.length > 5 && hasNumber) {
                 console.log("[Registration] Login and password validated.");
             } else {
-                return res.status(400)
-                    .send({status: 400});
+                return res.status(400).send({status: 400});
             }
 
             //sprawdzenie w bazie czy użytkownik o takim loginie już istnieje
@@ -29,8 +28,16 @@ const userController = {
                 };
 
                 await userModel.addToDatabase(newUser);
+
+                const newlyCreatedUser = await userModel.findUserByLogin(login);
+
+                const safeRegisterPayload = {
+                    id: newlyCreatedUser ? newlyCreatedUser.id : null,
+                    full_name: newUser.full_name,
+                    login: newUser.login
+                };
                 
-                res.status(201).send({status: 201});;
+                res.status(201).send({status: 201, payload: safeRegisterPayload});;
             } else {
                 return res.status(409).send({status: 409});
             }
@@ -51,10 +58,23 @@ const userController = {
 
             if (existingUser && existingUser.password === password) {
                 // Zapisujemy ID z bazy w sesji
-                req.session.userLogin = existingUser.id;
-                return res.send({status: 200});
+                req.session.userId = existingUser.id;
+                req.session.userLogin = existingUser.login;
+
+                req.session.user = {
+                    id: existingUser.id,
+                    login: existingUser.login
+                };
+
+                const safeLoginPayload = {
+                    id: existingUser.id,
+                    login: existingUser.login,
+                    full_name: existingUser.full_name
+                };
+
+                return res.send({status: 200, payload: safeLoginPayload});
             } else {
-                return res.status(401).send({status: 401});
+                return res.status(401).send({status: 401, error: 'Błędny login lub hasło. Sprawdź dane lub zarejestruj nowe konto.'});
             }
         } catch (error) {
             console.error("Błąd logowania:", error);

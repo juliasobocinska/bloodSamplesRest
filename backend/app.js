@@ -1,12 +1,19 @@
 //importowanie modułów
 const express = require('express');
 const app = express();
-const port = 3000;
+const port = 5000;
 const orderController = require('./controllers/orderController.sql.js'); // test nowego kontrolera
 const loginController = require('./controllers/loginController.sql.js'); // test nowego kontrolera
 const resultController = require('./controllers/resultController.sql.js'); // nowy kontroler wykików
 const session = require('express-session');
-require('./models/db'); // test bazy
+require('./models/db');
+app.use(express.json());
+const cors = require('cors');
+
+app.use(cors({
+    origin: 'http://localhost:3000', 
+    credentials: true 
+}));
 
 //konfiguracja silnika widoków
 app.set('view engine', 'ejs');
@@ -15,8 +22,8 @@ app.set('view engine', 'ejs');
 app.use(session({
   secret: 'tajny_klucz_098', 
   resave: false,
-  saveUninitialized: true,
-  cookie: { secure: false }
+  saveUninitialized: false,
+  cookie: { secure: false, sameSite: 'lax' }
 }));
 
 //parsowanie danych
@@ -46,7 +53,7 @@ app.get('/results', resultController.showMyResults);
 
 
 //uruchomienie serwera
-app.listen(port, () => {
-  console.log(`CenterLab app listening on port ${port}!`)
+app.listen(5000, () => {
+  console.log(`CenterLab app listening on port ${5000}!`)
 });
 

@@ -6,7 +6,7 @@ const resultController = {
     // 1. Wyświetlenie wyników dla zalogowanego pacjenta
     showMyResults: async (req, res) => {
         try {
-            const userId = req.session.userLogin;
+            const userId = req.query.userId;
 
             if (!userId) {
                 return res.status(401).send({status:401});
@@ -27,8 +27,15 @@ const resultController = {
 
             await Result.saveResult(orderId, testName, parseFloat(value));
 
+            const newResultData = {
+                orderId: orderId,
+                testName: testName,
+                value: parseFloat(value),
+                createdAt: new Date()
+            };
+
             console.log(`Zapisano nowy wynik dla zamówienia nr ${orderId}`);
-            res.status(201).send({status:201});
+            res.status(201).send({status:201, payload: newResultData});
 
         } catch (error) {
             console.error("Błąd zapisywania wyniku:", error);
