@@ -10,7 +10,6 @@ const currencyController = require('./controllers/currencyController.js');
 const session = require('express-session');
 require('./models/db');
 app.use(express.json());
-const cors = require('cors');
 
 app.use(cors({
     origin: 'http://localhost:3000', 
