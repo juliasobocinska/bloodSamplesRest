@@ -19,8 +19,15 @@ const handleLogin = async () => {
       }
     })
 
-    if (response.status === 200) {
+    if (response.status === 200 && response.payload?.token) {
       successMessage.value = `Zalogowano pomyślnie!`
+
+      const tokenCookie = useCookie('auth_token', {
+        maxAge: 60 * 60 * 24, 
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production'
+      })
+      tokenCookie.value = response.payload.token
 
       username.value = ''
       password.value = ''

@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+const { apiFetch } = useApi()
 
 const userIdCookie = useCookie('userId')
 const savedUserId = computed(() => userIdCookie.value)
@@ -17,7 +18,7 @@ const fetchHistory = async () => {
 
   try {
     
-    const response = await $fetch(`http://localhost:5000/orders?userId=${savedUserId.value}`, {
+    const response = await apiFetch(`http://localhost:5000/orders?userId=${savedUserId.value}`, {
       method: 'GET'
     })
 
@@ -34,7 +35,7 @@ const deleteOrder = async (orderId) => {
   if (!confirm('Czy na pewno chcesz usunąć to zamówienie?')) return
 
   try {
-    const response = await $fetch(`http://localhost:5000/orders/${orderId}`, {
+    const response = await apiFetch(`http://localhost:5000/orders/${orderId}`, {
       method: 'DELETE',
       body: {
         userId: savedUserId.value 

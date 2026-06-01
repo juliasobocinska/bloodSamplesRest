@@ -6,11 +6,11 @@ const orderController = {
         try {
             const userId = req.user.id;
             const orders = await Order.getAllOrders(userId);
-            return res.status(200).json({ orders: orders });
+            return res.status(200).json({ status: 200, payload: orders });
 
         } catch (error) {
             console.error("Błąd ładowania historii:", error);
-            return res.status(500).json({ error: "Błąd serwera podczas pobierania historii." });
+            return res.status(500).json({ status: 500, payload: "Błąd serwera podczas pobierania historii." });
         }
     },
 

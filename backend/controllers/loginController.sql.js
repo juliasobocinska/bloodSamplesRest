@@ -61,19 +61,20 @@ const userController = {
 
             // Jeśli użytkownik istnieje i hasła się zgadzają
             if (existingUser && existingUser.password === password) {
-                // Zapisujemy ID z bazy w sesji
-                req.session.userId = existingUser.id;
-                req.session.userLogin = existingUser.login;
-
-                req.session.user = {
-                    id: existingUser.id,
-                    login: existingUser.login
+                
+                const tokenPayload = {
+                id: existingUser.id,
+                login: existingUser.login
                 };
+
+                const tokenSecret = process.env.JWT_SECRET || 'super_tajny_klucz_awaryjny';
+                const token = jwt.sign(tokenPayload, tokenSecret, { expiresIn: '1d' });
 
                 const safeLoginPayload = {
                     id: existingUser.id,
                     login: existingUser.login,
-                    full_name: existingUser.full_name
+                    full_name: existingUser.full_name,
+                    token: token
                 };
 
                 return res.send({status: 200, payload: safeLoginPayload});

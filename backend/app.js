@@ -16,6 +16,10 @@ app.use(cors({
     credentials: true 
 }));
 
+// --- KONFIGURACJA PARSOWANIA DANYCH ---
+app.use(express.json()); 
+app.use(express.urlencoded({ extended: true }));
+
 // --- IMPORTY MIDDLEWARE I BAZY DANYCH ---
 const verifyToken = require('./middleware/auth');
 
@@ -60,12 +64,6 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 //----------------------------------------------
-
-app.use(cors());
-
-// --- KONFIGURACJA PARSOWANIA DANYCH ---
-app.use(express.json()); 
-app.use(express.urlencoded({ extended: true }));
 
 
 // --- ŚCIEŻKI REST API ---
