@@ -1,26 +1,31 @@
 const Order = require('../models/orderModel.sql');
 
 const orderController = {
-    // 1. POBIERANIE HISTORII ZAMÓWIEN (GET)
+    // 1. POBIERANIE HISTORII ZAMÓWIEŃ (GET)
     showHistory: async (req, res) => {
         try {
-            const userId = req.user.id;
+            const userId = req.user?.id;
+            if (!userId) {
+                return res.status(401).json({ error: "Brak autoryzacji. Zaloguj się ponownie." });
+            }
+
             const orders = await Order.getAllOrders(userId);
             return res.status(200).json({ status: 200, payload: orders });
 
         } catch (error) {
             console.error("Błąd ładowania historii:", error);
-            return res.status(500).json({ status: 500, payload: "Błąd serwera podczas pobierania historii." });
+            return res.status(500).json({ error: "Błąd serwera podczas pobierania historii." });
         }
     },
 
+    // 2. SKŁADANIE ZAMÓWIENIA (POST)
     handleOrder: async (req, res) => {
         try {
-            const { age, quantity_samples, tests, userId } = req.body;
-            const owner = userId;
+            const owner = req.user?.id;
+            const { age, quantity_samples, tests } = req.body;
 
             if (!owner) {
-                return res.status(401).send({status:401});
+                return res.status(401).json({ status: 401, error: "Brak autoryzacji. Zaloguj się ponownie." });
             }
 
             const userOrders = await Order.getAllOrders(parseInt(owner));
@@ -42,7 +47,8 @@ const orderController = {
                 age: parseInt(age) || 0,
                 quantity: parseInt(quantity_samples) || 1, 
                 tests: Array.isArray(tests) ? tests.join(', ') : (tests || "Brak badań"),
-                owner: owner,
+                user_id: owner, // na wypadek kolumny user_id w bazie
+                owner: owner,   // na wypadek kolumny owner w bazie
                 created_at: new Date()
             };
 
@@ -59,16 +65,15 @@ const orderController = {
     deleteOrder: async (req, res) => {
         try {
             const orderId = req.params.id;
-            const currentUserId = req.body.userId || req.query.userId;
+            // NAPRAWIONE: ID wyciągamy z bezpiecznego tokenu JWT
+            const currentUserId = req.user?.id; 
             
-            if(!currentUserId) {
-                res.status(401).send({status:401})
-                return
+            if (!currentUserId) {
+                return res.status(401).json({ status: 401, error: "Brak autoryzacji. Zaloguj się ponownie." });
             }
 
             await Order.deleteFromDatabase(orderId, currentUserId);
-            
-            res.status(200).send({status: 200});
+            return res.status(200).json({ status: 200, message: "Zamówienie usunięte pomyślnie." });
         } catch (error) {
             console.error("Błąd usuwania:", error);
             return res.status(500).json({ error: "Błąd serwera podczas usuwania zamówienia." });
@@ -85,24 +90,24 @@ const orderController = {
                 return res.status(404).json({ error: "Nie znaleziono zamówienia." });
             }
 
-            const currentUserId = req.query.userId || req.body.userId;
-            if (String(order.user_id) !== String(currentUserId)) {
-    
-                return res.status(403).send({status:403});
+            // NAPRAWIONE: Porównujemy id z tokenu z polem w bazie danych
+            const currentUserId = req.user?.id;
+            if (String(order.user_id) !== String(currentUserId) && String(order.owner) !== String(currentUserId)) {
+                return res.status(403).json({ status: 403, error: "Brak dostępu do tego zamówienia." });
             }
 
             const orderDate = new Date(order.created_at || order.date);
             const now = new Date();
             const diffInHours = (now - orderDate) / (1000 * 60 * 60);
 
-        if (diffInHours > 24) {
-            return res.status(400).send({
-                status: 400, 
-                error: "Czas na edycję tego zamówienia (24 godziny) już minął!" 
-            });
-        }
+            if (diffInHours > 24) {
+                return res.status(400).json({
+                    status: 400, 
+                    error: "Czas na edycję tego zamówienia (24 godziny) już minął!" 
+                });
+            }
 
-            res.status(200).send({status: 200, payload: order});
+            return res.status(200).json({ status: 200, payload: order });
 
         } catch (error) {
             console.error("Błąd ładowania strony edycji:", error);
@@ -114,12 +119,13 @@ const orderController = {
     handleUpdate: async (req, res) => {
         try {
             const orderId = req.params.id;
-            const {age, quantity_samples, tests} = req.body;
-            const uid = req.body.userId; 
+            const { age, quantity_samples, tests } = req.body;
+            
+            // NAPRAWIONE: Wyciągamy ID z tokenu zamiast req.body.userId
+            const uid = req.user?.id; 
 
-            if(!uid) {
-                res.status(401).send({status:401})
-                return
+            if (!uid) {
+                return res.status(401).json({ status: 401, error: "Brak autoryzacji." });
             }
 
             const updateOrder = {
@@ -130,14 +136,12 @@ const orderController = {
 
             await Order.updateInDatabase(orderId, updateOrder, uid);
             console.log(`Zamówienie ${orderId} zaktualizowane.`);
-            res.sendStatus(204);
+            return res.status(200).json({ status: 200, message: "Zaktualizowano pomyślnie." });
         } catch (error) {
             console.error("Błąd aktualizacji:", error);
             return res.status(500).json({ error: "Błąd podczas aktualizacji." });
-
         }
     },
-
 };
 
 module.exports = orderController;

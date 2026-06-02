@@ -1,12 +1,14 @@
 <script setup>
-import {ref} from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+
+// Przechowujemy ID edytowanego zamówienia (null = nowe zamówienie)
+const orderId = ref(null)
 
 const age = ref('')
 const quantitySamples = ref(1)
-const selectedTests = computed(() => availableTests.value.filter(i => i.checked).map(i => i.label))
-
-const errorMessage = ref('')
-const successMessage = ref('')
 
 const availableTests = ref([
   {id:1, label: 'Tarczyca (TSH)', checked: false},
@@ -21,14 +23,53 @@ const availableTests = ref([
   {id:10, label: 'Anemia', checked: false},
 ])
 
+const selectedTests = computed(() => availableTests.value.filter(i => i.checked).map(i => i.label))
+
+const errorMessage = ref('')
+const successMessage = ref('')
+
+// Jeśli komponent montuje się z parametrem ID w URL (np. /order?id=X), ładujemy dane do edycji
+onMounted(async () => {
+  const idFromUrl = route.query.id || route.params.id
+
+  if (idFromUrl) {
+    orderId.value = idFromUrl
+    const token = useCookie('auth_token').value
+
+    if (!token) return
+
+    try {
+      // Wywołujemy pobieranie konkretnego zamówienia z backendu
+      const response = await $fetch(`http://localhost:5000/orders/${idFromUrl}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+
+      if (response && response.payload) {
+        // Uzupełniamy formularz pobranymi danymi
+        age.value = response.payload.age
+        quantitySamples.value = response.payload.quantity || response.payload.quantity_samples
+        
+        // Mapujemy zapisany ciąg tekstowy z badaniami z powrotem na checkboxy
+        const savedTests = response.payload.tests ? response.payload.tests.split(', ') : []
+        availableTests.value.forEach(test => {
+          test.checked = savedTests.includes(test.label)
+        })
+      }
+    } catch (error) {
+      console.error("Błąd ładowania danych do edycji:", error)
+      errorMessage.value = "Nie udało się pobrać danych zamówienia do edycji."
+    }
+  }
+})
+
 const submitOrder = async () => {
   errorMessage.value = ''
   successMessage.value = ''
 
-  const savedUserId = useCookie('userId').value
+  const token = useCookie('auth_token').value
 
-if (!savedUserId) {
-    errorMessage.value = 'Twoja sesja wygasła. Zaloguj się lub zarejestruj ponownie, aby złożyć zamówienie.'
+  if (!token) {
+    errorMessage.value = 'Twoja sesja wygasła. Zaloguj się lub zarejestruj ponownie, aby zapisać zamówienie.'
     return
   }
 
@@ -36,38 +77,43 @@ try {
   const response = await $fetch('http://localhost:3000/orders', {
       method: 'POST',
       body: {
-        userId: savedUserId,
         age: age.value,
         quantity_samples: quantitySamples.value,
         tests: selectedTests.value
       }
     })
 
-    successMessage.value = 'Zamówienie zostało pomyślnie złożone!'
-    errorMessage.value = ''
+    if (isEdit) {
+      successMessage.value = 'Zamówienie zostało pomyślnie zaktualizowane!'
+      // Opcjonalnie: Przekierowanie do historii po udanej edycji
+      setTimeout(() => navigateTo('/history'), 1500)
+    } else {
+      successMessage.value = 'Zamówienie zostało pomyślnie złożone!'
+      // Resetujemy pola tylko dla nowego zamówienia
+      age.value = ''
+      quantitySamples.value = 1
+      availableTests.value.forEach(test => test.checked = false)
+    }
+  } catch (error) {
+    console.error("Błąd serwera:", error)
 
-    age.value = ''
-    selectedTests.value = []
-} catch (error) {
- console.error("Błąd serwera:", error)
-
-  if (error.response && error.response.status === 400) {
-    errorMessage.value = error.response._data?.error || 'Możesz złożyć zamówienie na badania maksymalnie raz na pół roku!'
-    successMessage.value = ''
-  } else {
-    errorMessage.value = 'Wystąpił błąd podczas składania zamówienia.'
-    successMessage.value = ''
-   }
+    if (error.response && error.response.status === 400) {
+      errorMessage.value = error.response._data?.error || 'Możesz złożyć zamówienie na badania maksymalnie raz na pół roku!' 
+    } else if (error.response && error.response.status === 401) {
+      errorMessage.value = 'Brak autoryzacji. Zaloguj się ponownie.'
+    } else {
+      errorMessage.value = isEdit ? 'Wystąpił błąd podczas aktualizacji zamówienia.' : 'Wystąpił błąd podczas składania zamówienia.'
+    }
   }
 }
 
 const logout = () => {
+  const tokenCookie = useCookie('auth_token')
+  const userCookie = useCookie('user_info')
 
-  const userIdCookie = useCookie('userId')
-
-  userIdCookie.value = null
-  return navigateTo('/')
-
+  tokenCookie.value = null
+  userCookie.value = null
+  return navigateTo('/login')
 }
 </script>
 
@@ -85,7 +131,7 @@ const logout = () => {
 
     <main class="main-content">
       <div class="order-card">
-        <h2>Zestaw do samodzielnego pobrania krwii</h2>
+        <h2>{{ orderId ? 'Edycja zamówienia' : 'Zestaw do samodzielnego pobrania krwii' }}</h2>
 
         <form @submit.prevent="submitOrder">
           <div class="form-group">
@@ -104,31 +150,31 @@ const logout = () => {
           <div class="form-group">
             <label for="quantitySamples">Ilość próbek:</label>
             <input
-            v-model="quantitySamples"
-            id="quantitySamples"
-            type="number"
-            min="1"
-            max="5"
-            required
+              v-model="quantitySamples"
+              id="quantitySamples"
+              type="number"
+              min="1"
+              max="5"
+              required
             />
           </div>
 
           <div class="test-container">
             <p class="section-title">Wybierz badania (max 5):</p>
-            <div v-for="test in availableTests" :key="test" class="checkbox-item">
+            <div v-for="test in availableTests" :key="test.id" class="checkbox-item">
               <UCheckbox
-              type="checkbox"
-              :key="test.id"
-              :label="test.label"
-              v-model="test.checked"
-              class="accent-rose-500"
-              :ui="{ base: 'data-[state=checked]:bg-violet-500 data-[state=checked]:border-violet-500'}"
+                type="checkbox"
+                :label="test.label"
+                v-model="test.checked"
+                class="accent-rose-500"
+                :ui="{ base: 'data-[state=checked]:bg-violet-500 data-[state=checked]:border-violet-500'}"
               />
-              <!-- <label :for="test">{{ test.label }}</label> -->
             </div>
           </div>
 
-          <button type="submit" class="btn-submit">Prześlij</button>
+          <button type="submit" class="btn-submit">
+            {{ orderId ? 'Zapisz zmiany' : 'Prześlij' }}
+          </button>
         </form>
 
         <p v-if="successMessage" class="message success">{{ successMessage }}</p>
@@ -138,9 +184,7 @@ const logout = () => {
   </div>
 </template>
 
-
 <style scoped>
-
   .logout {
     cursor: pointer;
   }
@@ -243,39 +287,6 @@ const logout = () => {
   color: #2e1f15;
   transition: border-color 0.2s ease;
 }
-/*
-.checkbox-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
-}
-
- .checkbox-item input[type="checkbox"] {
-  -webkit-appearance: none; 
-  -moz-appearance: none; 
-  appearance: none;
-  color: #dfdad0;
-  accent-color: #dfdad0;
-  background-color: #000;
-  border: 1px solid #2e1f15;
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-}
-
-.checkbox-item input[type="checkbox"]::before {
-  content: "";
-  width: 10px;
-  height: 10px;
-  transform: scale(0); 
-  transition: 100ms transform ease-in-out;
-  background-color: #2e1f15;
-}
-
-.checkbox-item input[type="checkbox"]:checked::before {
-  transform: scale(1);
-} */
 
 .test-container {
   margin: 20px 0;
@@ -291,8 +302,8 @@ const logout = () => {
   text-align: center;
   margin-top: 15px;
 }
-.message.error { color: #e53935; }
-.message.success { color: #388e3c; }
+.message.error { color: #671111; }
+.message.success { color: #043d0f; }
 
 .btn-submit {
   width: 100%;
@@ -307,5 +318,4 @@ const logout = () => {
   transition: background-color 0.2s ease;
   margin-top: 10px;
 }
-
 </style>

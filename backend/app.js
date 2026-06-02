@@ -11,12 +11,19 @@ const currencyController = require('./controllers/currencyController.js');
 
 require('./models/db');
 
+// --- 1. GLOBALNA KONFIGURACJA CORS (Zawsze na samej górze!) ---
 app.use(cors({
     origin: 'http://localhost:5000', 
     credentials: true 
 }));
 
-// --- KONFIGURACJA PARSOWANIA DANYCH ---
+// --- 2. LOGGER DO TESTÓW (Powie nam w terminalu o każdym ruchu!) ---
+app.use((req, res, next) => {
+    console.log(`[ŻĄDANIE] Metoda: ${req.method} | Ścieżka: ${req.url}`);
+    next();
+});
+
+// --- 3. PARSOWANIE DANYCH ---
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
 
@@ -29,7 +36,6 @@ const checkRole = require('./middleware/roleAuth');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
 
-// --- KONFIGURACJA SWAGGERA ---
 const swaggerOptions = {
     definition: {
         openapi: '3.0.0',
@@ -57,7 +63,6 @@ const swaggerOptions = {
             bearerAuth: []
         }],
     },
-    // Pliki, w których Swagger ma szukać komentarzy z dokumentacją
     apis: ['./docs/*.yaml'], 
 };
 
@@ -65,14 +70,12 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 //----------------------------------------------
 
-
 // --- ŚCIEŻKI REST API ---
 
 app.get('/', (req, res) => {
     res.status(200).json({ message: "API działa poprawnie" });
 });
 
-// Rejestracja i logowanie (Publiczne - każdy ma dostęp)
 app.post('/register', loginController.handleRegister);
 app.post('/login', loginController.handleLogin);
 
@@ -87,7 +90,6 @@ app.delete('/orders/:id', verifyToken, orderController.deleteOrder);     // Usuw
 app.get('/results', verifyToken, resultController.showMyResults);                               // Pacjent sprawdza wyniki (GET)
 app.post('/results', verifyToken, checkRole('laborant'), resultController.generateResult);      // Laborant dodaje wynik (POST)
 
-// Publiczny cennik z przelicznikiem walut NBP
 app.get('/pricelist/:code', currencyController.getPriceListInCurrency);
 
 // --- URUCHOMIENIE SERWERA ---

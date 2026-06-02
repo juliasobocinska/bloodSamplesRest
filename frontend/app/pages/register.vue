@@ -55,7 +55,7 @@ const handleRegister = async () => {
   <div class="page-container">
     <header class="navbar">
       <nav>
-        <NuxtLink to="/login" class="nav-item">Zaloguj się</NuxtLink>
+        <NuxtLink to="/login" class="nav-item">Zaloguj się</NuxtLink> |
         <NuxtLink to="/register" class="nav-item active">Zarejestruj się</NuxtLink>
       </nav>
     </header>
@@ -112,103 +112,129 @@ const handleRegister = async () => {
 
 <style scoped>
 
-.page-container { 
-  display: flex; 
-  flex-direction: column; 
-  min-height: 100vh; 
-  font-family: Arial, sans-serif; 
-  background-color: #f2f0ea; 
+.page-container {
+  min-height: 100vh;
+  background-color: #f2f0ea;
+  padding: 24px;
+  font-family: 'Garamond', 'Georgia', system-ui, sans-serif; 
+  box-sizing: border-box;
 }
 
-.navbar { 
-  border-bottom: 1px solid #4a3525;
-  padding: 20px 40px; 
+.navbar {
+  max-width: 896px;
+  margin: 0 auto 24px auto;
+  background-color: #f2f0ea;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid #f1f5f9;
 }
 
-.navbar nav { 
-  display: flex; 
-  gap: 30px; 
+.navbar nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #dfdad0; 
 }
 
-.nav-item { 
-  font-size: 16px; 
-  font-weight: 700; 
-  color: #333333; 
-  text-decoration: none; 
+.nav-item {
+  font-family: sans-serif; 
+  color: #5c5146; 
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 14px;
+  margin: 0 16px;
 }
 
-.nav-item.active { 
-  border-bottom: 2px solid #4a3525; 
-  padding-bottom: 5px; 
+.nav-item:hover {
+  color: #8b5a2b; 
 }
 
-.main-content { 
-  flex: 1; 
-  display: flex; 
-  justify-content: center; 
-  align-items: center; 
-  padding: 40px 20px; 
+.nav-item.active {
+  color: #2e1f15;
+  font-weight: bold;
+  border-bottom: 3px solid #8b5a2b;
+  padding-bottom: 4px;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
 }
 
 .auth-card { 
-  background: #ffffff; 
-  padding: 40px; 
-  border-radius: 12px; 
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0); 
-  width: 100%; 
-  max-width: 400px; 
-  border: 1px solid #4a3525; 
+  padding: 20px;
+  background-color: #2e1f151f;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(122, 82, 82, 0.582);
+  width: 100%;
+  max-width: 500px;
+  border: 1px solid #4a3525;
 }
 
 .auth-card h2 { 
-  text-align: center; 
-  margin-top: 0; 
-  margin-bottom: 30px; 
-  font-size: 26px; 
+  font-size: 26px;
   color: #2e1f15; 
+  margin-top: 0;
+  margin-bottom: 24px;
+  letter-spacing: -0.01em;
+  border-bottom: 2px solid #2e1f155a;
+  padding-bottom: 12px;
+  justify-self: center;
+  align-items: center; 
 }
 
-.form-group { 
-  display: flex; 
-  flex-direction: column; 
-  gap: 8px; 
-  margin-bottom: 24px; 
-  text-align: left; 
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+  text-align: left;
 }
 
-.form-group label { 
-  font-size: 16px; 
-  font-weight: 500; 
+.form-group label {
+  font-size: 15px;
+  font-weight: 600;
+  color: #444444;
 }
 
-.fullName-label,
-.login-label,
-.password-label {
-  color: #000000;
+.form-group input {
+  padding: 12px;
+  border: 1px solid #4a3525;
+  border-radius: 6px;
+  font-size: 15px;
+  background-color: #e9e8e5e2;
+  color: #2e1f15;
+  transition: border-color 0.2s ease;
 }
 
-.form-group input { 
-  padding: 12px; 
-  border: 1px solid #4a3525; 
-  border-radius: 6px; 
-  font-size: 15px; 
+.form-group input::placeholder {
+  color: #999999;
 }
 
-.btn-submit { 
-  width: 100%; 
-  padding: 14px; 
-  background-color: #4caf50; 
-  color: #ffffff; 
-  border: none; 
-  border-radius: 6px; 
-  font-size: 17px; 
-  font-weight: 700; 
-  cursor: pointer; 
-  transition: background-color 0.2s; 
+.form-group input:active {
+  background-color: #999999;
 }
 
-.btn-submit:hover { 
-  background-color: #43a047; 
+.btn-submit {
+  width: 100%;
+  padding: 14px;
+  background-color: #2e1f15;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-top: 10px;
+}
+
+.btn-submit:hover {
+  background-color: #2e1f15;
 }
 
 .message { 
