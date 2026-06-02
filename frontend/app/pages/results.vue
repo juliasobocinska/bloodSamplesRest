@@ -17,7 +17,7 @@ const fetchResults = async () => {
   }
 
   try {
-    const response = await $fetch(`http://localhost:5000/results?userId=${savedUserId.value}`, {
+    const response = await $fetch(`http://localhost:3000/results?userId=${savedUserId.value}`, {
       method: 'GET'
     })
 

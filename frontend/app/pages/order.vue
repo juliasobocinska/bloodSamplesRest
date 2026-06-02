@@ -33,7 +33,7 @@ if (!savedUserId) {
   }
 
 try {
-  const response = await $fetch('http://localhost:5000/orders', {
+  const response = await $fetch('http://localhost:3000/orders', {
       method: 'POST',
       body: {
         userId: savedUserId,

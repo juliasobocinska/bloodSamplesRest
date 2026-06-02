@@ -22,7 +22,7 @@ const handleRegister = async () => {
   const formattedFullName = fullName.value.trim().replace(/\b\w/g, c => c.toUpperCase())
 
   try {
-    const response = await $fetch('http://localhost:5000/register', {
+    const response = await $fetch('http://localhost:3000/register', {
       method: 'POST',
       body: {
         full_name: formattedFullName,

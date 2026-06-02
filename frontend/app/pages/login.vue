@@ -11,7 +11,7 @@ const handleLogin = async () => {
   successMessage.value = ''
 
   try {
-    const response = await $fetch('http://localhost:5000/login', {
+    const response = await $fetch('http://localhost:3000/login', {
       method: 'POST',
       body: {
         username: username.value,
@@ -28,6 +28,9 @@ const handleLogin = async () => {
         secure: process.env.NODE_ENV === 'production'
       })
       tokenCookie.value = response.payload.token
+
+      const userIdCookie = useCookie('userId')
+      userIdCookie.value = response.payload.id
 
       username.value = ''
       password.value = ''
