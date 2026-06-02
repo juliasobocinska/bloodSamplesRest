@@ -1,28 +1,37 @@
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 
-const resend = new Resend('re_hWVkNqdY_w58EKVBbuTbBvEwMDiFQGQuP'); // Klucz API a RESEND, podmień jeśłi robisz z innego konta!
+// Konfiguracja wirtualnej skrzynki deweloperskiej Mailtrap
+const transporter = nodemailer.createTransport({
+    host: "sandbox.smtp.mailtrap.io",
+    port: 2525,
+    auth: {
+        user: "400480d7644f47",
+        pass: "e679567fea0e33"
+    }
+});
 
 const sendResultEmail = async (patientEmail, testName, interpretation) => {
     try {
-        const data = await resend.emails.send({
-            from: 'Laboratorium <onboarding@resend.dev>', 
+        const mailOptions = {
+            from: '"Laboratorium CenterLab" <system@centerlab.pl>',
             to: patientEmail,
             subject: `Nowy wynik badania: ${testName}`,
             html: `
                 <div style="font-family: Arial, sans-serif; padding: 20px; color: #2e1f15;">
                     <h2 style="color: #8b5a2b;">CenterLab - Wyniki Badań</h2>
                     <p>Witaj,</p>
-                    <p>Informujemy, że w systemie pojawił się wynik Twojego badania: <strong>${testName}</strong>.</p>
+                    <p>Informujemy, że w systemie pojawił się wynik badania: <strong>${testName}</strong>.</p>
                     <p>Interpretacja: <strong>${interpretation}</strong></p>
-                    <p>Zaloguj się do swojego panelu, aby sprawdzić szczegóły.</p>
+                    <p>Wiadomość wysłana na adres: ${patientEmail}</p>
                 </div>
             `
-        });
+        };
 
-        console.log('E-mail wysłany przez Resend!', data);
+        const info = await transporter.sendMail(mailOptions);
+        console.log(`[Mailtrap] Wiadomość schowana w sandboxie dla: ${patientEmail}`);
         return true;
     } catch (error) {
-        console.error('Błąd Resend:', error);
+        console.error("Błąd wirtualnej wysyłki Mailtrap:", error);
         return false;
     }
 };

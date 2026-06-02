@@ -37,7 +37,7 @@ const resultController = {
                 try {
                     await sendResultEmail(patientEmail, testName, interpretation);
                 } catch (mailError) {
-                    console.error("Resend zablokował wysyłkę (prawdopodobnie adres nie jest w darmowym Sandboxie):", mailError.message);
+                    console.error("Serwer pocztowy zgłosił błąd wysyłki:", mailError.message);
                 }
             } else {
                 console.log(`Zamówienie nr ${orderId} nie ma przypisanego adresu e-mail w systemie. Pomijam wysyłkę.`);
