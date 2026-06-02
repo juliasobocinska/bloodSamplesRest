@@ -2,7 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const port = 5000;
+const port = 3000;
 
 const orderController = require('./controllers/orderController.sql.js'); 
 const loginController = require('./controllers/loginController.sql.js'); 
