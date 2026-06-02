@@ -56,7 +56,7 @@ const handleLogin = async () => {
   <div class="page-container">
     <header class="navbar">
   <nav>
-    <span class="nav-item active">Strona Główna</span>
+    <span class="nav-item active">Strona Główna</span> |
     
     <NuxtLink to="/register" class="nav-item">Zarejestruj się</NuxtLink>
   </nav>
@@ -108,33 +108,48 @@ const handleLogin = async () => {
 <style scoped>
 
 .page-container {
-  display: flex;
-  flex-direction: column;
   min-height: 100vh;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   background-color: #f2f0ea;
+  padding: 24px;
+  font-family: 'Garamond', 'Georgia', system-ui, sans-serif; 
+  box-sizing: border-box;
 }
 
 .navbar {
-  border-bottom: 1px solid #4a3525;
-  padding: 20px 40px;
+  max-width: 896px;
+  margin: 0 auto 24px auto;
+  background-color: #f2f0ea;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid #f1f5f9;
 }
 
 .navbar nav {
   display: flex;
-  gap: 30px;
+  justify-content: center;
+  align-items: center;
+  color: #dfdad0; 
 }
 
 .nav-item {
-  font-size: 16px;
-  font-weight: 700;
-  color: #333333;
-  cursor: pointer;
-  padding-bottom: 5px;
+  font-family: sans-serif; 
+  color: #5c5146; 
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 14px;
+  margin: 0 16px;
+}
+
+.nav-item:hover {
+  color: #8b5a2b; 
 }
 
 .nav-item.active {
-  border-bottom: 2px solid #4a3525;
+  color: #2e1f15;
+  font-weight: bold;
+  border-bottom: 3px solid #8b5a2b;
+  padding-bottom: 4px;
 }
 
 .main-content {
@@ -142,40 +157,43 @@ const handleLogin = async () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #ffffff; 
   padding: 40px 20px;
 }
 
 .login-card {
-  background: #ffffff;
-  padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+  background-color: #2e1f151f;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(122, 82, 82, 0.582);
   width: 100%;
-  max-width: 450px;
+  max-width: 500px;
   border: 1px solid #4a3525;
 }
 
 .login-card h2 {
-  text-align: center;
+  font-size: 26px;
+  color: #2e1f15; 
   margin-top: 0;
-  margin-bottom: 30px;
-  font-size: 28px;
-  color: #2e1f15;
-  font-weight: 700;
+  margin-bottom: 24px;
+  letter-spacing: -0.01em;
+  border-bottom: 2px solid #2e1f155a;
+  padding-bottom: 12px;
+  justify-self: center;
+  align-items: center;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
+  text-align: left;
 }
 
 .form-group label {
-  font-size: 16px;
-  font-weight: 500;
-  color: #333333;
+  font-size: 15px;
+  font-weight: 600;
+  color: #444444;
 }
 
 .form-group input {
@@ -183,8 +201,9 @@ const handleLogin = async () => {
   border: 1px solid #4a3525;
   border-radius: 6px;
   font-size: 15px;
-  color: #333333;
-  background-color: #ffffff;
+  background-color: #e9e8e5e2;
+  color: #2e1f15;
+  transition: border-color 0.2s ease;
 }
 
 .form-group input::placeholder {
@@ -194,11 +213,11 @@ const handleLogin = async () => {
 .btn-submit {
   width: 100%;
   padding: 14px;
-  background-color: #4caf50;
+  background-color: #2e1f15;
   color: #ffffff;
   border: none;
   border-radius: 6px;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
   cursor: pointer;
   transition: background-color 0.2s ease;
@@ -206,7 +225,7 @@ const handleLogin = async () => {
 }
 
 .btn-submit:hover {
-  background-color: #43a047;
+  background-color: #2e1f15;
 }
 
 /* Powiadomienia */

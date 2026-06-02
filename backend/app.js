@@ -3,33 +3,39 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const port = 5000;
-const orderController = require('./controllers/orderController.sql.js'); // test nowego kontrolera
-const loginController = require('./controllers/loginController.sql.js'); // test nowego kontrolera
-const resultController = require('./controllers/resultController.sql.js'); // nowy kontroler wykików
+const orderController = require('./controllers/orderController.sql.js'); 
+const loginController = require('./controllers/loginController.sql.js'); 
+const resultController = require('./controllers/resultController.sql.js'); 
 const currencyController = require('./controllers/currencyController.js');
 const session = require('express-session');
 require('./models/db');
-app.use(express.json());
 
+// --- 1. GLOBALNA KONFIGURACJA CORS (Zawsze na samej górze!) ---
 app.use(cors({
     origin: 'http://localhost:3000', 
-    credentials: true 
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// --- KONFIGURACJA PARSOWANIA DANYCH ---
+// --- 2. LOGGER DO TESTÓW (Powie nam w terminalu o każdym ruchu!) ---
+app.use((req, res, next) => {
+    console.log(`[ŻĄDANIE] Metoda: ${req.method} | Ścieżka: ${req.url}`);
+    next();
+});
+
+// --- 3. PARSOWANIE DANYCH ---
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
 
-// --- IMPORTY MIDDLEWARE I BAZY DANYCH ---
+// --- 4. IMPORTY MIDDLEWARE AUTORYZACJI ---
 const verifyToken = require('./middleware/auth');
-
 
 //----------------------------------------------
 // --- IMPORTY I KONFIGURACJA SWAGGERA ---
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
 
-// --- KONFIGURACJA SWAGGERA ---
 const swaggerOptions = {
     definition: {
         openapi: '3.0.0',
@@ -57,7 +63,6 @@ const swaggerOptions = {
             bearerAuth: []
         }],
     },
-    // Pliki, w których Swagger ma szukać komentarzy z dokumentacją
     apis: ['./docs/*.yaml'], 
 };
 
@@ -65,35 +70,29 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 //----------------------------------------------
 
-
 // --- ŚCIEŻKI REST API ---
-
 
 app.get('/', (req, res) => {
     res.status(200).json({ message: "API działa poprawnie" });
 });
 
-// Rejestracja i logowanie (Publiczne - każdy ma dostęp)
 app.post('/register', loginController.handleRegister);
 app.post('/login', loginController.handleLogin);
 
-// CRUD Zamówień (Chronione przez verifyToken - trzeba być zalogowanym)
-app.post('/orders', verifyToken, orderController.handleOrder);           // Tworzenie (POST)
-app.get('/orders', verifyToken, orderController.showHistory);            // Pobieranie wszystkich (GET)
-app.get('/orders/:id', verifyToken, orderController.getOrderById);       // Pobieranie pojedynczego do edycji (GET)
-app.put('/orders/:id', verifyToken, orderController.handleUpdate);       // Aktualizacja (PUT)
-app.delete('/orders/:id', verifyToken, orderController.deleteOrder);     // Usuwanie (DELETE)
+// CRUD Zamówień
+app.post('/orders', verifyToken, orderController.handleOrder);           
+app.get('/orders', verifyToken, orderController.showHistory);            
+app.get('/orders/:id', verifyToken, orderController.getOrderById);       
+app.put('/orders/:id', verifyToken, orderController.handleUpdate);       
+app.delete('/orders/:id', verifyToken, orderController.deleteOrder);     
 
-// Wyniki badań (Chronione)
-app.get('/results', verifyToken, resultController.showMyResults);        // Pacjent sprawdza wyniki (GET)
-app.post('/results', verifyToken, resultController.generateResult);      // Laborant dodaje wynik (POST)
+// Wyniki badań
+app.get('/results', verifyToken, resultController.showMyResults);        
+app.post('/results', verifyToken, resultController.generateResult);      
 
-// Publiczny cennik z przelicznikiem walut NBP
 app.get('/pricelist/:code', currencyController.getPriceListInCurrency);
 
 // --- URUCHOMIENIE SERWERA ---
 app.listen(port, () => {
   console.log(`CenterLab API listening on port ${port}!`)
 });
-
-
