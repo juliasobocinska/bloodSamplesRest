@@ -21,6 +21,7 @@ export default defineNuxtConfig({
       }
     }
   },
+<<<<<<< HEAD
   // 1. port frontendu
   devServer: {
     port: 3001
@@ -29,6 +30,11 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiBase: 'http://localhost:3000'
+=======
+  runtimeConfig: {
+    public: {
+      apiBase: 'http://localhost:5000'
+>>>>>>> a4fd96b1e209fbc55928e07f7c40bd4bb2198ead
     }
   }
 })

@@ -2,19 +2,26 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const port = 3000;
+const port = 5000;
+const orderController = require('./controllers/orderController.sql.js'); // test nowego kontrolera
+const loginController = require('./controllers/loginController.sql.js'); // test nowego kontrolera
+const resultController = require('./controllers/resultController.sql.js'); // nowy kontroler wykików
+const currencyController = require('./controllers/currencyController.js');
+const session = require('express-session');
+require('./models/db');
+app.use(express.json());
+
+app.use(cors({
+    origin: 'http://localhost:3000', 
+    credentials: true 
+}));
+
+// --- KONFIGURACJA PARSOWANIA DANYCH ---
+app.use(express.json()); 
+app.use(express.urlencoded({ extended: true }));
 
 // --- IMPORTY MIDDLEWARE I BAZY DANYCH ---
 const verifyToken = require('./middleware/auth');
-require('./models/db'); // połączenie z bazą
-
-
-// --- IMPORTY KONTROLERÓW ---
-const orderController = require('./controllers/orderController.sql.js'); 
-const loginController = require('./controllers/loginController.sql.js'); 
-const resultController = require('./controllers/resultController.sql.js');
-const currencyController = require('./controllers/currencyController.js');
-
 
 
 //----------------------------------------------
@@ -58,12 +65,6 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 //----------------------------------------------
 
-app.use(cors());
-
-// --- KONFIGURACJA PARSOWANIA DANYCH ---
-app.use(express.json()); 
-app.use(express.urlencoded({ extended: true }));
-
 
 // --- ŚCIEŻKI REST API ---
 
@@ -77,8 +78,6 @@ app.post('/register', loginController.handleRegister);
 app.post('/login', loginController.handleLogin);
 
 // CRUD Zamówień (Chronione przez verifyToken - trzeba być zalogowanym)
-app.post('/orders', verifyToken, orderController.handleOrder);           // Tworzenie (POST)
-app.get('/orders', verifyToken, orderController.showHistory);            // Pobieranie wszystkich (GET)
 app.get('/orders/:id', verifyToken, orderController.getOrderById);       // Pobieranie pojedynczego do edycji (GET)
 app.put('/orders/:id', verifyToken, orderController.handleUpdate);       // Aktualizacja (PUT)
 app.delete('/orders/:id', verifyToken, orderController.deleteOrder);     // Usuwanie (DELETE)
