@@ -86,6 +86,7 @@ class Order {
             throw err;
         }
     }
+    
     // Zapisywanie zmian zamówienia
     static async updateInDatabase(id, updatedData, uid) {
         try {
@@ -99,6 +100,23 @@ class Order {
         } catch (err) {
             console.error('Błąd updateInDatabase:', err);
             throw err;
+        }
+    }
+
+    // Pobieranie adresu e-mail pacjenta na podstawie ID zamówienia
+    static async getPatientEmailByOrderId(orderId) {
+        try {
+            const query = `
+                SELECT u.email 
+                FROM orders o
+                JOIN users u ON o.user_id = u.id
+                WHERE o.id = $1
+            `;
+            const res = await db.query(query, [orderId]);
+            return res.rows[0] ? res.rows[0].email : null;
+        } catch (err) {
+            console.error('Błąd getPatientEmailByOrderId:', err);
+            return null;
         }
     }
 }

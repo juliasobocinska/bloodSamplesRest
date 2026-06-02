@@ -1,12 +1,11 @@
 const { Resend } = require('resend');
 
-// Wstaw swój klucz API tutaj (lub najlepiej do pliku .env!)
-const resend = new Resend('re_hWVkNqdY_w58EKVBbuTbBvEwMDiFQGQuP');
+const resend = new Resend('re_hWVkNqdY_w58EKVBbuTbBvEwMDiFQGQuP'); // Klucz API a RESEND, podmień jeśłi robisz z innego konta!
 
 const sendResultEmail = async (patientEmail, testName, interpretation) => {
     try {
         const data = await resend.emails.send({
-            from: 'Laboratorium <onboarding@resend.dev>', // W Resend na darmowym planie używasz ich domeny
+            from: 'Laboratorium <onboarding@resend.dev>', 
             to: patientEmail,
             subject: `Nowy wynik badania: ${testName}`,
             html: `

@@ -25,12 +25,23 @@ const resultController = {
             await Result.saveResult(orderId, testName, parseFloat(value));
 
             // --- SEKCJA WYSYŁANIA E-MAILA ---
-            const testEmail = "sebastian.szew2@gmail.com"; 
-            
-            const tempResult = new Result(null, orderId, testName, parseFloat(value));
-            const interpretation = tempResult.getInterpretation();
-            
-            await sendResultEmail(testEmail, testName, interpretation);
+            const Order = require('../models/orderModel.sql');
+            const patientEmail = await Order.getPatientEmailByOrderId(orderId);
+
+            if (patientEmail) {
+                console.log(`Wykryto adres e-mail pacjenta: ${patientEmail}. Uruchamiam wysyłkę...`);
+                
+                const tempResult = new Result(null, orderId, testName, parseFloat(value));
+                const interpretation = tempResult.getInterpretation();
+                
+                try {
+                    await sendResultEmail(patientEmail, testName, interpretation);
+                } catch (mailError) {
+                    console.error("Resend zablokował wysyłkę (prawdopodobnie adres nie jest w darmowym Sandboxie):", mailError.message);
+                }
+            } else {
+                console.log(`Zamówienie nr ${orderId} nie ma przypisanego adresu e-mail w systemie. Pomijam wysyłkę.`);
+            }
             // -------------------------------------
 
             const newResultData = {
