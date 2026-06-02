@@ -24,19 +24,19 @@ const orderController = {
             }
 
             const userOrders = await Order.getAllOrders(parseInt(owner));
-        if (userOrders && userOrders.length > 0) {
-            const lastOrder = userOrders[0]; 
+            if (userOrders && userOrders.length > 0) {
+                const lastOrder = userOrders[0]; 
 
-            const lastOrderDate = new Date(lastOrder.created_at || lastOrder.date);
-            const today = new Date();
+                const lastOrderDate = new Date(lastOrder.created_at || lastOrder.date);
+                const today = new Date();
 
-            // Obliczamy różnicę w miesiącach
-            const diffInMonths = (today.getFullYear() - lastOrderDate.getFullYear()) * 12 + (today.getMonth() - lastOrderDate.getMonth());
+                // Obliczamy różnicę w miesiącach
+                const diffInMonths = (today.getFullYear() - lastOrderDate.getFullYear()) * 12 + (today.getMonth() - lastOrderDate.getMonth());
 
-            if (diffInMonths < 6) {
-                return res.status(400).send({ status: 400, error: 'Możesz złożyć zamówienie na badania maksymalnie raz na pół roku!' });
+                if (diffInMonths < 6) {
+                    return res.status(400).send({ status: 400, error: 'Możesz złożyć zamówienie na badania maksymalnie raz na pół roku!' });
+                }
             }
-        }
 
             const newOrderData = {
                 age: parseInt(age) || 0,
@@ -44,12 +44,11 @@ const orderController = {
                 tests: Array.isArray(tests) ? tests.join(', ') : (tests || "Brak badań"),
                 owner: owner,
                 created_at: new Date()
-        };
+            };
 
             await Order.addToDatabase(newOrderData);
-            return res.status(201).json({ message: "Zamówienie zostało utworzone pomyślnie." }); 
+            return res.status(201).json({ status: 201, message: "Zamówienie zostało utworzone pomyślnie.", payload: newOrderData }); 
 
-            res.status(201).send({status:201, payload: newOrderData});
         } catch (error) {
             console.error("Błąd składania zamówienia:", error);
             return res.status(500).json({ error: "Błąd serwera podczas składania zamówienia." });

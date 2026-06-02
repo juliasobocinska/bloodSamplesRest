@@ -5,11 +5,7 @@ const resultController = {
     // 1. Pobieranie wyników dla pacjenta (GET)
     showMyResults: async (req, res) => {
         try {
-<<<<<<< HEAD
-            const userId = req.user.id;
-=======
             const userId = req.query.userId;
->>>>>>> a4fd96b1e209fbc55928e07f7c40bd4bb2198ead
 
             const userResults = await Result.getAllForUser(userId);
             return res.status(200).json({ results: userResults });
@@ -26,11 +22,6 @@ const resultController = {
             const {orderId, testName, value} = req.body;
 
             await Result.saveResult(orderId, testName, parseFloat(value));
-<<<<<<< HEAD
-            console.log(`Zapisano nowy wynik dla zamówienia nr ${orderId}`);
-
-            return res.status(201).json({ message: `Zapisano nowy wynik dla zamówienia nr ${orderId}` });
-=======
 
             const newResultData = {
                 orderId: orderId,
@@ -41,7 +32,6 @@ const resultController = {
 
             console.log(`Zapisano nowy wynik dla zamówienia nr ${orderId}`);
             res.status(201).send({status:201, payload: newResultData});
->>>>>>> a4fd96b1e209fbc55928e07f7c40bd4bb2198ead
 
         } catch (error) {
             console.error("Błąd zapisywania wyniku:", error);

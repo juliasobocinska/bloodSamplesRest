@@ -1,8 +1,7 @@
 const userModel = require('../models/userModel.sql'); 
 const jwt = require('jsonwebtoken'); // Niezbędna biblioteka do JWT
 require('dotenv').config(); // Ładowanie klucza JWT z pliku .env
-const jwt = require('jsonwebtoken'); // Niezbędna biblioteka do JWT
-require('dotenv').config(); // Ładowanie klucza JWT z pliku .env
+
 
 const userController = {
 
@@ -15,11 +14,7 @@ const userController = {
             const hasNumber = /\d/.test(password);
 
             //walidacja loginu i hasła
-            if(login.length > 3 && password.length > 5 && hasNumber) {
-                console.log("[Registration] Login and password validated.");
-            } else {
-                return res.status(400).send({status: 400});
-            if(!(login.length > 3 && password.length > 5 && hasNumber)) {
+            if (!(login.length > 3 && password.length > 5 && hasNumber)) {
                 return res.status(400).json({ 
                     error: "Login musi mieć min. 4 znaki, a hasło min. 6 znaków i zawierać cyfrę." 
                 });
@@ -50,19 +45,15 @@ const userController = {
                 return res.status(201).json({ message: "Konto utworzone pomyślnie." });
             } else {
                 return res.status(409).json({ error: "Ten login jest już zajęty." });
-                return res.status(409).json({ error: "Ten login jest już zajęty." });
             }
 
 
         } catch (error) {
             console.error("Błąd rejestracji:", error);
             return res.status(500).json({ error: "Wystąpił błąd serwera przy rejestracji." });
-            return res.status(500).json({ error: "Wystąpił błąd serwera przy rejestracji." });
         }
     },
 
-    // LOGOWANIE - Weryfikacja danych i generowanie tokena JWT
-    handleLogin: async (req, res) => {
     // LOGOWANIE - Weryfikacja danych i generowanie tokena JWT
     handleLogin: async (req, res) => {
         try {
@@ -72,7 +63,6 @@ const userController = {
             //sprawdzamy czy użytkownik o danym loginie istnieje bazie
             const existingUser = await userModel.findUserByLogin(login);
 
-            // Jeśli użytkownik istnieje i hasła się zgadzają
             // Jeśli użytkownik istnieje i hasła się zgadzają
             if (existingUser && existingUser.password === password) {
                 
@@ -115,7 +105,6 @@ const userController = {
             }
         } catch (error) {
             console.error("Błąd logowania:", error);
-            return res.status(500).json({ error: "Wystąpił błąd serwera." });
             return res.status(500).json({ error: "Wystąpił błąd serwera." });
         }
     },
