@@ -38,15 +38,15 @@ const handleLogin = async () => {
     if (response.status === 200) {
       successMessage.value = `Witaj, ${response.payload.full_name}!`
 
-      username.value = ''
-      password.value = ''
+      const tokenCookie = useCookie('auth_token')
+      tokenCookie.value = response.payload.token
 
       const userCookie = useCookie('userId')
       userCookie.value = response.payload.id
 
       const userRoleCookie = useCookie('userRole')
       userRoleCookie.value = response.payload.role
-
+      
       if (response.payload.role === 'laborant') {
         await navigateTo('/lab')
       } else {

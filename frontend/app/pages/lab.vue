@@ -58,8 +58,9 @@ const logout = () => {
     useCookie('userId').value = null
     useCookie('userRole').value = null
     useCookie('auth_token').value = null
-    return navigateTo('/')
+    return navigateTo('/login') 
 }
+
 </script>
 
 <template>
@@ -85,10 +86,9 @@ const logout = () => {
                         <label>Nazwa Badania:</label>
                         <select v-model="testName" required>
                             <option value="" disabled>Wybierz z listy...</option>
-                            <option value="Anemia">Anemia</option>
+                            <option value="Morfologia">Morfologia</option>
                             <option value="Glukoza">Glukoza</option>
-                            <option value="Morfologia pełna">Morfologia pełna</option>
-                            <option value="Tarczyca (TSH)">Tarczyca (TSH)</option>
+                            <option value="Cholesterol">Cholesterol</option>
                         </select>
                     </div>
 

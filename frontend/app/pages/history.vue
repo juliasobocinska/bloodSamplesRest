@@ -52,8 +52,10 @@ const deleteOrder = async (orderId) => {
 }
 
 const logout = () => {
-    userIdCookie.value = null
-    return navigateTo('/')
+    useCookie('userId').value = null
+    useCookie('userRole').value = null
+    useCookie('auth_token').value = null
+    return navigateTo('/login') 
 }
 
 onMounted(async () => {

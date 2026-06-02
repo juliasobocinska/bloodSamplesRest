@@ -38,7 +38,7 @@ onMounted(async () => {
     if (!token) return
 
     try {
-      const response = await $fetch(`http://localhost:5000/orders/${idFromUrl}`, {
+      const response = await $fetch(`http://localhost:3000/orders/${idFromUrl}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
 
@@ -107,13 +107,12 @@ const submitOrder = async () => {
 }
 
 const logout = () => {
-  const tokenCookie = useCookie('auth_token')
-  const userCookie = useCookie('user_info')
-
-  tokenCookie.value = null
-  userCookie.value = null
-  return navigateTo('/login')
+    useCookie('userId').value = null
+    useCookie('userRole').value = null
+    useCookie('auth_token').value = null
+    return navigateTo('/login') 
 }
+
 </script>
 
 <template>
