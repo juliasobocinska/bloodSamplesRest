@@ -7,7 +7,6 @@ const port = 3000;
 const orderController = require('./controllers/orderController.sql.js'); 
 const loginController = require('./controllers/loginController.sql.js'); 
 const resultController = require('./controllers/resultController.sql.js'); 
-const currencyController = require('./controllers/currencyController.js');
 
 require('./models/db');
 
@@ -89,8 +88,6 @@ app.delete('/orders/:id', verifyToken, orderController.deleteOrder);     // Usuw
 // Wyniki badań (Chronione)
 app.get('/results', verifyToken, resultController.showMyResults);                               // Pacjent sprawdza wyniki (GET)
 app.post('/results', verifyToken, checkRole('laborant'), resultController.generateResult);      // Laborant dodaje wynik (POST)
-
-app.get('/pricelist/:code', currencyController.getPriceListInCurrency);
 
 // --- URUCHOMIENIE SERWERA ---
 app.listen(port, () => {

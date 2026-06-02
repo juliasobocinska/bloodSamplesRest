@@ -82,15 +82,15 @@ class Order {
             const res = await db.query(query, [id]);
             return res.rows[0];
         } catch (err) {
-            console.error('Błąd findByUd', err);
+            console.error('Błąd findById', err);
             throw err;
         }
     }
-    
+
     // Zapisywanie zmian zamówienia
     static async updateInDatabase(id, updatedData, uid) {
         try {
-            const {age, quantity, sample_type, tests} = updatedData;
+            const {age, quantity, sample_type} = updatedData;
             const query = `
             UPDATE orders
             SET age = $1, quantity = $2, sample_type = $3
