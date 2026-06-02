@@ -5,7 +5,7 @@ const resultController = {
     // 1. Pobieranie wyników dla pacjenta (GET)
     showMyResults: async (req, res) => {
         try {
-            const userId = req.query.userId;
+            const userId = req.user.id;
 
             const userResults = await Result.getAllForUser(userId);
             return res.status(200).json({ results: userResults });

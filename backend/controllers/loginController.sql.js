@@ -40,9 +40,7 @@ const userController = {
                     login: newUser.login
                 };
                 
-                res.status(201).send({status: 201, payload: safeRegisterPayload});;
-                
-                return res.status(201).json({ message: "Konto utworzone pomyślnie." });
+                return res.status(201).json({ message: "Konto utworzone pomyślnie.", payload: safeRegisterPayload });
             } else {
                 return res.status(409).json({ error: "Ten login jest już zajęty." });
             }
@@ -82,25 +80,7 @@ const userController = {
                 };
 
                 return res.send({status: 200, payload: safeLoginPayload});
-                // Generowanie Tokena JWT
-                const token = jwt.sign(
-                    { id: existingUser.id, login: existingUser.login }, // Dane zaszyfrowane w tokenie (payload)
-                    process.env.JWT_SECRET || 'awaryjny_klucz_dla_dev', // Klucz szyfrujący
-                    { expiresIn: '2h' }                                 // Token wygaśnie po 2 godzinach
-                );
-
-                // Odsyłamy token i dane użytkownika do FrontEndu
-                return res.status(200).json({ 
-                    message: "Zalogowano pomyślnie",
-                    token: token,
-                    user: { 
-                        id: existingUser.id, 
-                        name: existingUser.full_name 
-                    }
-                });
-
             } else {
-                return res.status(401).send({status: 401, error: 'Błędny login lub hasło. Sprawdź dane lub zarejestruj nowe konto.'});
                 return res.status(401).json({ error: "Nieprawidłowy login lub hasło." });
             }
         } catch (error) {
