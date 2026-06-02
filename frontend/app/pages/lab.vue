@@ -10,10 +10,9 @@ const testValue = ref('')
 const errorMessage = ref('')
 const successMessage = ref('')
 
-// Zabezpieczenie strony przed zwykłymi pacjentami
 onMounted(() => {
     if (userRoleCookie.value !== 'laborant') {
-        navigateTo('/') // Wyrzuca na stronę główną, jeśli to nie laborant
+        navigateTo('/') 
     }
 })
 
@@ -21,7 +20,6 @@ const submitResult = async () => {
     errorMessage.value = ''
     successMessage.value = ''
 
-    // 1. Pobieramy token bezpośrednio z ciasteczka
     const token = useCookie('auth_token').value
 
     if (!token) {
@@ -32,14 +30,13 @@ const submitResult = async () => {
     try {
         const response = await $fetch('http://localhost:3000/results', {
             method: 'POST',
-            // 2. MUSISZ DODAĆ NAGŁÓWEK AUTORYZACJI
             headers: {
                 'Authorization': `Bearer ${token}`
             },
             body: {
                 orderId: parseInt(orderId.value),
                 testName: testName.value,
-                value: parseFloat(testValue.value.replace(',', '.')) // Obsługa przecinka
+                value: parseFloat(String(testValue.value).replace(',', '.'))
             }
         })
 

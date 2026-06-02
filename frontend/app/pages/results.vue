@@ -9,7 +9,6 @@ const fetchResults = async () => {
   errorMessage.value = ''
   isLoading.value = true
 
-  // POPRAWIONE: Pobieramy token JWT zamiast starego userId
   const token = useCookie('auth_token').value
 
   if (!token) {
@@ -19,15 +18,17 @@ const fetchResults = async () => {
   }
 
   try {
-    const response = await $fetch(`http://localhost:3000/results?userId=${savedUserId.value}`, {
-      method: 'GET'
+    const response = await $fetch(`http://localhost:3000/results`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     })
 
-    // Sprawdzamy strukturę payloadu (zgodnie z ujednoliconym kontrolerem backendu)
     if (response && response.payload) {
       results.value = response.payload
-    } else if (Array.isArray(response)) {
-      results.value = response
+    } else {
+      results.value = [] 
     }
 
   } catch (error) {
@@ -43,7 +44,6 @@ const fetchResults = async () => {
 }
 
 const logout = () => {
-  // POPRAWIONE: Czyścimy tokeny uwierzytelniające JWT podczas wylogowania
   const tokenCookie = useCookie('auth_token')
   const userCookie = useCookie('user_info')
 
@@ -92,18 +92,16 @@ onMounted(async () => {
             <tr>
               <th>Nazwa badania</th>
               <th>Wynik</th>
-              <th>Norma</th>
               <th>Status</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="result in results" :key="result.id">
               <td class="test-name">{{ result.test_name }}</td>
-              <td class="test-value">{{ result.test_result }}</td>
-              <td>{{ result.norm_range }}</td>
+              <td class="test-value">{{ result.test_value || result.value }}</td> 
               <td>
-                <span :class="result.status?.toLowerCase() === 'norma' ? 'status-norma' : 'status-alarm'">
-                  {{ result.status || 'Brak danych' }}
+                <span :class="result.description === 'W normie' ? 'status-norma' : 'status-alarm'">
+                  {{ result.description || 'Brak danych' }}
                 </span>
               </td>
             </tr>

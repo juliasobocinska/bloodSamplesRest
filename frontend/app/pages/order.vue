@@ -28,7 +28,6 @@ const selectedTests = computed(() => availableTests.value.filter(i => i.checked)
 const errorMessage = ref('')
 const successMessage = ref('')
 
-// Jeśli komponent montuje się z parametrem ID w URL (np. /order?id=X), ładujemy dane do edycji
 onMounted(async () => {
   const idFromUrl = route.query.id || route.params.id
 
@@ -39,17 +38,14 @@ onMounted(async () => {
     if (!token) return
 
     try {
-      // Wywołujemy pobieranie konkretnego zamówienia z backendu
       const response = await $fetch(`http://localhost:5000/orders/${idFromUrl}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
 
       if (response && response.payload) {
-        // Uzupełniamy formularz pobranymi danymi
         age.value = response.payload.age
         quantitySamples.value = response.payload.quantity || response.payload.quantity_samples
         
-        // Mapujemy zapisany ciąg tekstowy z badaniami z powrotem na checkboxy
         const savedTests = response.payload.tests ? response.payload.tests.split(', ') : []
         availableTests.value.forEach(test => {
           test.checked = savedTests.includes(test.label)
@@ -73,9 +69,15 @@ const submitOrder = async () => {
     return
   }
 
-try {
-  const response = await $fetch('http://localhost:3000/orders', {
-      method: 'POST',
+  try {
+    const url = orderId.value ? `http://localhost:3000/orders/${orderId.value}` : 'http://localhost:3000/orders'
+    const method = orderId.value ? 'PUT' : 'POST'
+
+    const response = await $fetch(url, {
+      method: method,
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
       body: {
         age: age.value,
         quantity_samples: quantitySamples.value,
@@ -83,26 +85,23 @@ try {
       }
     })
 
-    if (isEdit) {
+    if (orderId.value) { 
       successMessage.value = 'Zamówienie zostało pomyślnie zaktualizowane!'
-      // Opcjonalnie: Przekierowanie do historii po udanej edycji
       setTimeout(() => navigateTo('/history'), 1500)
     } else {
       successMessage.value = 'Zamówienie zostało pomyślnie złożone!'
-      // Resetujemy pola tylko dla nowego zamówienia
       age.value = ''
       quantitySamples.value = 1
       availableTests.value.forEach(test => test.checked = false)
     }
   } catch (error) {
     console.error("Błąd serwera:", error)
-
     if (error.response && error.response.status === 400) {
-      errorMessage.value = error.response._data?.error || 'Możesz złożyć zamówienie na badania maksymalnie raz na pół roku!' 
+      errorMessage.value = error.response._data?.error || 'Błąd zapytania!' 
     } else if (error.response && error.response.status === 401) {
       errorMessage.value = 'Brak autoryzacji. Zaloguj się ponownie.'
     } else {
-      errorMessage.value = isEdit ? 'Wystąpił błąd podczas aktualizacji zamówienia.' : 'Wystąpił błąd podczas składania zamówienia.'
+      errorMessage.value = orderId.value ? 'Wystąpił błąd podczas aktualizacji zamówienia.' : 'Wystąpił błąd podczas składania zamówienia.'
     }
   }
 }

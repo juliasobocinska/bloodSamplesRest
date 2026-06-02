@@ -1,4 +1,5 @@
 const Result = require('../models/resultModel.sql.js');
+const { sendResultEmail } = require('../services/emailService.js');
 
 const resultController = {
 
@@ -8,7 +9,7 @@ const resultController = {
             const userId = req.user.id;
 
             const userResults = await Result.getAllForUser(userId);
-            return res.status(200).json({ results: userResults });
+            return res.status(200).json({ payload: userResults });;
 
         } catch (error) {
             console.error("Błąd pobierania wyników:", error);
@@ -22,6 +23,15 @@ const resultController = {
             const {orderId, testName, value} = req.body;
 
             await Result.saveResult(orderId, testName, parseFloat(value));
+
+            // --- SEKCJA WYSYŁANIA E-MAILA ---
+            const testEmail = "sebastian.szew2@gmail.com"; 
+            
+            const tempResult = new Result(null, orderId, testName, parseFloat(value));
+            const interpretation = tempResult.getInterpretation();
+            
+            await sendResultEmail(testEmail, testName, interpretation);
+            // -------------------------------------
 
             const newResultData = {
                 orderId: orderId,

@@ -89,7 +89,7 @@ class Order {
     // Zapisywanie zmian zamówienia
     static async updateInDatabase(id, updatedData, uid) {
         try {
-            const {age, quantity, sample_type} = updatedData;
+            const {age, quantity, sample_type, tests} = updatedData;
             const query = `
             UPDATE orders
             SET age = $1, quantity = $2, sample_type = $3
