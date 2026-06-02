@@ -1,5 +1,5 @@
 <script setup>
-import {ref} from 'vue'
+import { ref, onMounted } from 'vue'
 
 const username = ref('')
 const password = ref('')
@@ -7,12 +7,23 @@ const errorMessage = ref('')
 const successMessage = ref('')
 const showRegisterLink = ref(false)
 
-// wysyłanie danych do bckd
+onMounted(() => {
+  const userIdCookie = useCookie('userId')
+  const userRoleCookie = useCookie('userRole')
+
+  if (userIdCookie.value) {
+    if (userRoleCookie.value === 'laborant') {
+      navigateTo('/lab')
+    } else {
+      navigateTo('/order')
+    }
+  }
+})
+
 const handleLogin = async () => {
   errorMessage.value = ''
   successMessage.value = ''
   showRegisterLink.value = false
-
 
   try {
     const response = await $fetch('http://localhost:3000/login', {
@@ -33,23 +44,28 @@ const handleLogin = async () => {
       const userCookie = useCookie('userId')
       userCookie.value = response.payload.id
 
-      await navigateTo('/order')
+      const userRoleCookie = useCookie('userRole')
+      userRoleCookie.value = response.payload.role
+
+      if (response.payload.role === 'laborant') {
+        await navigateTo('/lab')
+      } else {
+        await navigateTo('/order')
+      }
     }
   } catch (error) {
-  if (error.response) {
-    if (error.response.status === 401) {
-      errorMessage.value = 'Błędny login lub hasło. Sprawdź dane lub zarejestruj nowe konto.'
-      showRegisterLink.value = true
+    if (error.response) {
+      if (error.response.status === 401) {
+        errorMessage.value = 'Błędny login lub hasło. Sprawdź dane lub zarejestruj nowe konto.'
+        showRegisterLink.value = true
+      } else {
+        errorMessage.value = error.response._data?.error || `Błąd serwera (Status: ${error.response.status})`
+      }
     } else {
-      // Wyświetli nam np. "Błąd serwera (Status: 500)" lub "Status: 404"
-      errorMessage.value = error.response._data?.error || `Błąd serwera (Status: ${error.response.status})`
+      errorMessage.value = `Błąd połączenia: ${error.message || 'CORS lub zły adres URL'}`
     }
-  } else {
-    // Jeśli zapytanie w ogóle nie dotarło do portu 5000 (np. przez blokadę CORS)
-    errorMessage.value = `Błąd połączenia: ${error.message || 'CORS lub zły adres URL'}`
   }
 }
-  }
 </script>
 
 <template>

@@ -40,7 +40,7 @@ class User {
     // Szukanie użytkownika po ID
     static async findUserByID(id) {
         try {
-            const res = await db.query('SELECT id, email AS login, password, full_name FROM users WHERE id = $1', [id]);
+            const res = await db.query('SELECT id, email AS login, password, full_name, role FROM users WHERE id = $1', [id]);
             return res.rows[0] || null;
         } catch (err) {
             return null;
@@ -50,7 +50,7 @@ class User {
     // Szukanie użytkownika po loginie (u nas kolumna email)
     static async findUserByLogin(login) {
         try {
-            const res = await db.query('SELECT id, email AS login, password, full_name FROM users WHERE email = $1', [login]);
+            const res = await db.query('SELECT id, email AS login, password, full_name, role FROM users WHERE email = $1', [login]);
             return res.rows[0] || null;
         } catch (err) {
             console.error('Błąd (findUserByLogin):', err);

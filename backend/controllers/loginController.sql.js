@@ -70,12 +70,17 @@ const userController = {
                 };
 
                 const tokenSecret = process.env.JWT_SECRET || 'super_tajny_klucz_awaryjny';
-                const token = jwt.sign(tokenPayload, tokenSecret, { expiresIn: '1d' });
+                const token = jwt.sign(
+                    { id: existingUser.id, login: existingUser.login, role: existingUser.role }, 
+                    tokenSecret, 
+                    { expiresIn: '2h' }
+                );
 
                 const safeLoginPayload = {
                     id: existingUser.id,
                     login: existingUser.login,
                     full_name: existingUser.full_name,
+                    role: existingUser.role,
                     token: token
                 };
 

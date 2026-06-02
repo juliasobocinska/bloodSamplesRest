@@ -32,10 +32,17 @@ const handleLogin = async () => {
       const userIdCookie = useCookie('userId')
       userIdCookie.value = response.payload.id
 
+      const userRoleCookie = useCookie('userRole')
+      userRoleCookie.value = response.payload.role
+
       username.value = ''
       password.value = ''
   
-      await navigateTo('/order')
+      if (response.payload.role === 'laborant') {
+        await navigateTo('/lab')
+      } else {
+        await navigateTo('/order')
+      }
     }
   } catch (error) {
     if (error.response && error.response._data) {

@@ -22,7 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // --- IMPORTY MIDDLEWARE ---
 const verifyToken = require('./middleware/auth');
-
+const checkRole = require('./middleware/roleAuth'); 
 
 //----------------------------------------------
 // --- IMPORTY I KONFIGURACJA SWAGGERA ---
@@ -84,8 +84,8 @@ app.put('/orders/:id', verifyToken, orderController.handleUpdate);       // Aktu
 app.delete('/orders/:id', verifyToken, orderController.deleteOrder);     // Usuwanie
 
 // Wyniki badań (Chronione)
-app.get('/results', verifyToken, resultController.showMyResults);        // Pacjent sprawdza wyniki (GET)
-app.post('/results', verifyToken, resultController.generateResult);      // Laborant dodaje wynik (POST)
+app.get('/results', verifyToken, resultController.showMyResults);                               // Pacjent sprawdza wyniki (GET)
+app.post('/results', verifyToken, checkRole('laborant'), resultController.generateResult);      // Laborant dodaje wynik (POST)
 
 // Publiczny cennik z przelicznikiem walut NBP
 app.get('/pricelist/:code', currencyController.getPriceListInCurrency);
