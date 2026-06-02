@@ -91,7 +91,7 @@ app.get('/pricelist/:code', currencyController.getPriceListInCurrency);
 
 // --- URUCHOMIENIE SERWERA ---
 app.listen(port, () => {
-  console.log(`CenterLab API listening on port ${port}!`)
+    console.log(`CenterLab API listening on port ${port}!`)
 });
 
 
