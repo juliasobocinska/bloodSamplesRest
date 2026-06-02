@@ -7,7 +7,6 @@ require('dotenv').config(); // Ładowanie klucza JWT z pliku .env
 const userController = {
 
     // REJESTRACJA - Tworzymy nowe konto i zwracamy JSON
-    // REJESTRACJA - Tworzymy nowe konto i zwracamy JSON
     handleRegister: async (req, res) => {
         try {
             const login = String(req.body.username || "").trim();
@@ -26,7 +25,6 @@ const userController = {
                 });
             }
 
-            // Sprawdzenie czy użytkownik już istnieje
             // Sprawdzenie czy użytkownik już istnieje
             const existingUser = await userModel.findUserByLogin(login);
 

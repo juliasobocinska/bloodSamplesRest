@@ -3,13 +3,13 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const port = 5000;
-const orderController = require('./controllers/orderController.sql.js'); // test nowego kontrolera
-const loginController = require('./controllers/loginController.sql.js'); // test nowego kontrolera
-const resultController = require('./controllers/resultController.sql.js'); // nowy kontroler wykików
+
+const orderController = require('./controllers/orderController.sql.js'); 
+const loginController = require('./controllers/loginController.sql.js'); 
+const resultController = require('./controllers/resultController.sql.js'); 
 const currencyController = require('./controllers/currencyController.js');
-const session = require('express-session');
+
 require('./models/db');
-app.use(express.json());
 
 app.use(cors({
     origin: 'http://localhost:3000', 
@@ -20,7 +20,7 @@ app.use(cors({
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
 
-// --- IMPORTY MIDDLEWARE I BAZY DANYCH ---
+// --- IMPORTY MIDDLEWARE ---
 const verifyToken = require('./middleware/auth');
 
 
@@ -68,7 +68,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // --- ŚCIEŻKI REST API ---
 
-
 app.get('/', (req, res) => {
     res.status(200).json({ message: "API działa poprawnie" });
 });
@@ -78,9 +77,11 @@ app.post('/register', loginController.handleRegister);
 app.post('/login', loginController.handleLogin);
 
 // CRUD Zamówień (Chronione przez verifyToken - trzeba być zalogowanym)
-app.get('/orders/:id', verifyToken, orderController.getOrderById);       // Pobieranie pojedynczego do edycji (GET)
-app.put('/orders/:id', verifyToken, orderController.handleUpdate);       // Aktualizacja (PUT)
-app.delete('/orders/:id', verifyToken, orderController.deleteOrder);     // Usuwanie (DELETE)
+app.get('/orders', verifyToken, orderController.showHistory);            // Historia zamówień
+app.get('/orders/:id', verifyToken, orderController.getOrderById);       // Pobieranie do edycji
+app.post('/orders', verifyToken, orderController.handleOrder);           // Składanie zamówienia
+app.put('/orders/:id', verifyToken, orderController.handleUpdate);       // Aktualizacja 
+app.delete('/orders/:id', verifyToken, orderController.deleteOrder);     // Usuwanie
 
 // Wyniki badań (Chronione)
 app.get('/results', verifyToken, resultController.showMyResults);        // Pacjent sprawdza wyniki (GET)
