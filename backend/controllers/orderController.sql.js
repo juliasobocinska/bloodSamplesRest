@@ -128,6 +128,10 @@ const orderController = {
                 return res.status(401).json({ status: 401, error: "Brak autoryzacji." });
             }
 
+            if(tests.length < 1) {
+                return res.status(400).json({ status: 400, error: "Minimum jedno badanie powinno być zaznaczone." })
+            }
+
             const updateOrder = {
                 age: parseInt(age),
                 quantity: parseInt(quantity_samples),
