@@ -30,4 +30,13 @@ CREATE TABLE IF NOT EXISTS results (
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS payments (
+    id SERIAL PRIMARY KEY,
+    order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE,
+    payu_id text,
+    price INTEGER,
+    description TEXT,
+    status VARCHAR(255)
+);
+
 
