@@ -1,4 +1,5 @@
 const Order = require('../models/orderModel.sql');
+const { validateAddress } = require('../services/geocode');
 
 const orderController = {
     // 1. POBIERANIE HISTORII ZAMÓWIEŃ (GET)
@@ -41,6 +42,11 @@ const orderController = {
                 if (diffInMonths < 6) {
                     return res.status(400).send({ status: 400, error: 'Możesz złożyć zamówienie na badania maksymalnie raz na pół roku!' });
                 }
+            }
+
+            const check = await validateAddress(address)
+            if (!check.valid) {
+                return res.status(422).json({ status: 422, error: 'Nieprawidłowy adres' })
             }
 
             const newOrderData = {
@@ -132,7 +138,11 @@ const orderController = {
             if(tests.length < 1) {
                 return res.status(400).json({ status: 400, error: "Minimum jedno badanie powinno być zaznaczone." })
             }
-            
+
+            const check = validateAddress(address)
+            if (!check.valid) {
+                return res.status(422).json({ status: 422, error: 'Nieprawidłowy adres' })
+            }
 
             const updateOrder = {
                 age: parseInt(age),
