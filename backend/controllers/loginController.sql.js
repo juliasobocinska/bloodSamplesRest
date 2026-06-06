@@ -40,15 +40,15 @@ const userController = {
                     login: newUser.login
                 };
                 
-                return res.status(201).json({ message: "Konto utworzone pomyślnie.", payload: safeRegisterPayload });
+                return res.status(201).json({ status:201, message: "Konto utworzone pomyślnie.", payload: safeRegisterPayload });
             } else {
-                return res.status(409).json({ error: "Ten login jest już zajęty." });
+                return res.status(409).json({ status:409, error: "Ten login jest już zajęty." });
             }
 
 
         } catch (error) {
             console.error("Błąd rejestracji:", error);
-            return res.status(500).json({ error: "Wystąpił błąd serwera przy rejestracji." });
+            return res.status(500).json({ status:500, error: "Wystąpił błąd serwera przy rejestracji." });
         }
     },
 

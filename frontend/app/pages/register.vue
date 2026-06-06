@@ -32,7 +32,7 @@ const handleRegister = async () => {
     })
 
     if (response.status === 200 || response.status === 201) {
-      successMessage.value = `Konto zostało utworzone. Przejź do zakładki zaloguj.`
+      successMessage.value = `Konto zostało utworzone. Przejdź do zakładki zaloguj.`
       fullName.value = ''
       password.value = ''
       username.value = ''
