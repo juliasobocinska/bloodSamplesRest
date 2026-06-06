@@ -125,15 +125,7 @@ const logout = () => {
 
 <template>
   <div class="page-container">
-    <header class="navbar">
-      <nav>
-        <NuxtLink to="/" class="nav-item">Strona Główna</NuxtLink> |
-        <NuxtLink to="/order" class="nav-item active">Złóż zamówienie</NuxtLink> |
-        <NuxtLink to="/history" class="nav-item">Historia zamówień</NuxtLink> | 
-        <NuxtLink to="/results" class="nav-item">Moje wyniki</NuxtLink> |
-        <span class="nav-item logout"  @click="logout">Wyloguj</span> 
-      </nav>
-    </header>
+    <MainNav />
 
     <main class="main-content">
       <div class="order-card">
@@ -196,9 +188,7 @@ const logout = () => {
 </template>
 
 <style scoped>
-  .logout {
-    cursor: pointer;
-  }
+
 
 .page-container {
   min-height: 100vh;
@@ -206,43 +196,6 @@ const logout = () => {
   padding: 24px;
   font-family: 'Garamond', 'Georgia', system-ui, sans-serif; 
   box-sizing: border-box;
-}
-
-.navbar {
-  max-width: 896px;
-  margin: 0 auto 24px auto;
-  background-color: #f2f0ea;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border-radius: 16px;
-  padding: 16px;
-  border: 1px solid #f1f5f9;
-}
-
-.navbar nav {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #dfdad0; 
-}
-
-.nav-item {
-  font-family: sans-serif; 
-  color: #5c5146; 
-  text-decoration: none;
-  font-weight: bold;
-  font-size: 14px;
-  margin: 0 16px;
-}
-
-.nav-item:hover {
-  color: #8b5a2b; 
-}
-
-.nav-item.active {
-  color: #2e1f15;
-  font-weight: bold;
-  border-bottom: 3px solid #8b5a2b;
-  padding-bottom: 4px;
 }
 
 .main-content {

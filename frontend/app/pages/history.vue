@@ -69,15 +69,7 @@ onMounted(async () => {
 
 <template>
   <div class="page-container">
-    <header class="navbar">
-      <nav>
-        <NuxtLink to="/" class="nav-item">Strona Główna</NuxtLink> |
-        <NuxtLink to="/order" class="nav-item">Złóż zamówienie</NuxtLink> |
-        <NuxtLink to="/history" class="nav-item active">Historia zamówień</NuxtLink> |
-        <NuxtLink to="/results" class="nav-item">Moje wyniki</NuxtLink> |
-        <span class="nav-item" @click="logout">Wyloguj</span>
-      </nav>
-    </header>
+    <MainNav />
     <main class="main-content">
       <h2>Historia Zamówień</h2>
       <p v-if="orders.length === 0 && !errorMessage" class="no-orders">

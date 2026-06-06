@@ -53,12 +53,7 @@ const handleRegister = async () => {
 
 <template>
   <div class="page-container">
-    <header class="navbar">
-      <nav>
-        <NuxtLink to="/login" class="nav-item">Zaloguj się</NuxtLink> |
-        <NuxtLink to="/register" class="nav-item active">Zarejestruj się</NuxtLink>
-      </nav>
-    </header>
+    <MainNav />
 
     <main class="main-content">
       <div class="auth-card">

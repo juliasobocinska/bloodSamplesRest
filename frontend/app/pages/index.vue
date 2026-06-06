@@ -1,265 +1,78 @@
-<script setup>
-import { ref, onMounted } from 'vue'
+  <template>
+    <div class="page-container">
+      <MainNav />
 
-const username = ref('')
-const password = ref('')
-const errorMessage = ref('')
-const successMessage = ref('')
-const showRegisterLink = ref(false)
-
-onMounted(() => {
-  const userIdCookie = useCookie('userId')
-  const userRoleCookie = useCookie('userRole')
-
-  if (userIdCookie.value) {
-    if (userRoleCookie.value === 'laborant') {
-      navigateTo('/lab')
-    } else {
-      navigateTo('/order')
-    }
-  }
-})
-
-const handleLogin = async () => {
-  errorMessage.value = ''
-  successMessage.value = ''
-  showRegisterLink.value = false
-
-  try {
-    const response = await $fetch('http://localhost:3000/login', {
-      method: 'POST',
-      credentials: 'include',
-      body: {
-        username: username.value,
-        password: password.value
-      }
-    })
-
-    if (response.status === 200) {
-      successMessage.value = `Witaj, ${response.payload.full_name}!`
-
-      const tokenCookie = useCookie('auth_token')
-      tokenCookie.value = response.payload.token
-
-      const userCookie = useCookie('userId')
-      userCookie.value = response.payload.id
-
-      const userRoleCookie = useCookie('userRole')
-      userRoleCookie.value = response.payload.role
-      
-      if (response.payload.role === 'laborant') {
-        await navigateTo('/lab')
-      } else {
-        await navigateTo('/order')
-      }
-    }
-  } catch (error) {
-    if (error.response) {
-      if (error.response.status === 401) {
-        errorMessage.value = 'Błędny login lub hasło. Sprawdź dane lub zarejestruj nowe konto.'
-        showRegisterLink.value = true
-      } else {
-        errorMessage.value = error.response._data?.error || `Błąd serwera (Status: ${error.response.status})`
-      }
-    } else {
-      errorMessage.value = `Błąd połączenia: ${error.message || 'CORS lub zły adres URL'}`
-    }
-  }
-}
-</script>
-
-<template>
-  <div class="page-container">
-    <header class="navbar">
-  <nav>
-    <span class="nav-item active">Strona Główna</span> |
-    
-    <NuxtLink to="/register" class="nav-item">Zarejestruj się</NuxtLink>
-  </nav>
-</header>
-
-    <main class="main-content">
-      <div class="login-card">
-        <h2>Zaloguj się</h2>
-
-        <form @submit.prevent="handleLogin">
-          <div class="form-group">
-            <label for="login">Login:</label>
-            <input
-              v-model="username"
-              id="login"
-              type="text"
-              placeholder="Wpisz login"
-              required
-            />
+      <header class="hero">
+        <div class="hero-inner">
+          <div class="hero-left">
+            <h1>Center Lab - szybkie i pewne badania krwi</h1>
+            <p class="lead">Zamów badanie, śledź wyniki online i odbierz raporty - prosto, bezpiecznie i szybko.</p>
           </div>
+        </div>
+      </header>
 
-          <div class="form-group">
-            <label for="password">Hasło:</label>
-            <input
-            v-model="password"
-            id="password"
-            type="password"
-            placeholder="Wpisz hasło"
-            required
-            />
+      <section class="features">
+        <div class="container">
+          <h2>Dlaczego warto?</h2>
+          <div class="grid">
+            <div class="feature">
+              <h4>Szybkie wyniki</h4>
+              <p>Automatyzacja procesu gwarantuje krótszy czas oczekiwania na wyniki.</p>
+            </div>
+            <div class="feature">
+              <h4>Bezpieczeństwo</h4>
+              <p>Dane i raporty przechowywane są zgodnie z dobrymi praktykami.</p>
+            </div>
+            <div class="feature">
+              <h4>Cena</h4>
+              <p>W pełni darmowe badania krwi raz na pół roku.</p>
+            </div>
           </div>
-
-          <button type="submit" class="btn-submit">Zaloguj się</button>
-        </form>
-
-        <p v-if="errorMessage" class="message error">{{ errorMessage }}</p>
-        <p v-if="successMessage" class="message success">{{ successMessage }}</p>
-      </div>
-    </main>
-
-    <footer class="footer">
-      <p>&copy; 2026 BloodSamples&trade;</p>
-    </footer>
-  </div>
-</template>
+        </div>
+      </section>
+    </div>
+  </template>
 
 
 
 <style scoped>
 
-.page-container {
-  min-height: 100vh;
-  background-color: #f2f0ea;
-  padding: 24px;
-  font-family: 'Garamond', 'Georgia', system-ui, sans-serif; 
-  box-sizing: border-box;
-}
+  .page-container {
+    padding-top: 24px;
+    min-height: 100vh;
+    background: linear-gradient(180deg,#faf9f6 0%, #f2f0ea 100%);
+    font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    color: #2e2b28;
+  }
 
-.navbar {
-  max-width: 896px;
-  margin: 0 auto 24px auto;
-  background-color: #f2f0ea;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border-radius: 16px;
-  padding: 16px;
-  border: 1px solid #f1f5f9;
-}
+  .hero {
+    padding: 48px 16px;
+  }
+  .hero-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    gap: 32px;
+    align-items: center;
+  }
+  .hero-left {
+    flex: 1;
+  }
+  .hero h1 {
+    font-size: 32px;
+    margin: 0 0 12px 0;
+  }
+  .lead { color: #555; font-size: 16px; margin-bottom: 18px; }
 
-.navbar nav {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #dfdad0; 
-}
+  .features { padding: 40px 16px; }
+  .features .container { max-width: 1100px; margin: 0 auto; }
+  .features h2 { margin-bottom: 18px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+  .feature { background: #fff; padding: 18px; border-radius: 10px; box-shadow: 0 4px 16px rgba(44,44,44,0.05); }
 
-.nav-item {
-  font-family: sans-serif; 
-  color: #5c5146; 
-  text-decoration: none;
-  font-weight: bold;
-  font-size: 14px;
-  margin: 0 16px;
-}
-
-.nav-item:hover {
-  color: #8b5a2b; 
-}
-
-.nav-item.active {
-  color: #2e1f15;
-  font-weight: bold;
-  border-bottom: 3px solid #8b5a2b;
-  padding-bottom: 4px;
-}
-
-.main-content {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 40px 20px;
-}
-
-.login-card {
-  padding: 20px;
-  background-color: #2e1f151f;
-  border-radius: 15px;
-  box-shadow: 0 4px 20px rgba(122, 82, 82, 0.582);
-  width: 100%;
-  max-width: 500px;
-  border: 1px solid #4a3525;
-}
-
-.login-card h2 {
-  font-size: 26px;
-  color: #2e1f15; 
-  margin-top: 0;
-  margin-bottom: 24px;
-  letter-spacing: -0.01em;
-  border-bottom: 2px solid #2e1f155a;
-  padding-bottom: 12px;
-  justify-self: center;
-  align-items: center;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 20px;
-  text-align: left;
-}
-
-.form-group label {
-  font-size: 15px;
-  font-weight: 600;
-  color: #444444;
-}
-
-.form-group input {
-  padding: 12px;
-  border: 1px solid #4a3525;
-  border-radius: 6px;
-  font-size: 15px;
-  background-color: #e9e8e5e2;
-  color: #2e1f15;
-  transition: border-color 0.2s ease;
-}
-
-.form-group input::placeholder {
-  color: #999999;
-}
-
-.btn-submit {
-  width: 100%;
-  padding: 14px;
-  background-color: #2e1f15;
-  color: #ffffff;
-  border: none;
-  border-radius: 6px;
-  font-size: 17px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  margin-top: 10px;
-}
-
-.btn-submit:hover {
-  background-color: #2e1f15;
-}
-
-/* Powiadomienia */
-.message {
-  text-align: center;
-  margin-top: 20px;
-  font-weight: bold;
-  font-size: 14px;
-}
-.message.error { color: #d32f2f; }
-.message.success { color: #388e3c; }
-
-/* Stopka na dole */
-.footer {
-  text-align: center;
-  padding: 30px;
-  border-top: 1px solid #4a3525;
-  color: #888888;
-  font-size: 14px;
-}
-</style>
+  @media (max-width: 800px) {
+    .hero-inner { flex-direction: column-reverse; }
+    .hero-right { width: 100%; }
+    .hero h1 { font-size: 24px; }
+  }
+  </style>
