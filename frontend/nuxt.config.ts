@@ -23,7 +23,8 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      apiBase: 'http://localhost:3000'
+      apiBase: 'http://localhost:3000',
+      googleMapsKey: process.env.NUXT_PUBLIC_GOOGLE_MAPS_KEY,
     }
   }
 })
