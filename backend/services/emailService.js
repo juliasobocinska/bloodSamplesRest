@@ -36,4 +36,29 @@ const sendResultEmail = async (patientEmail, testName, interpretation) => {
     }
 };
 
-module.exports = { sendResultEmail };
+const sendConfirmationEmail = async (patientEmail) => {
+    try {
+        const mailOptions = {
+            from: '"Laboratorium CenterLab" <system@centerlab.pl>',
+            to: patientEmail,
+            subject: `Nowe konto w systemie CenterLab`,
+            html: `
+                <div style="font-family: Arial, sans-serif; padding: 20px; color: #2e1f15;">
+                    <h2 style="color: #8b5a2b;">CenterLab - Nowe konto</h2>
+                    <p>Witaj,</p>
+                    <p>Informujemy, że w systemie zarejestrowano nowego użytkownika.</p>
+                    <p>Jeżeli to Ty, to nie musisz nic robić. Jeżeli nie, skontaktuj się z nami.</p>
+                </div>
+            `
+        };
+
+        const info = await transporter.sendMail(mailOptions);
+        console.log(`[Mailtrap] Wiadomość schowana w sandboxie dla: ${patientEmail}`);
+        return true;
+    } catch (error) {
+        console.error("Błąd wirtualnej wysyłki Mailtrap:", error);
+        return false;
+    }
+};
+
+module.exports = { sendResultEmail, sendConfirmationEmail };

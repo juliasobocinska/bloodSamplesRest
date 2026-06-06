@@ -1,6 +1,7 @@
 const userModel = require('../models/userModel.sql'); 
 const jwt = require('jsonwebtoken'); // Niezbędna biblioteka do JWT
 require('dotenv').config(); // Ładowanie klucza JWT z pliku .env
+const { sendConfirmationEmail } = require('../services/emailService'); // Import funkcji wysyłającej emaila
 
 
 const userController = {
@@ -55,7 +56,9 @@ const userController = {
                     full_name: newUser.full_name,
                     login: newUser.login
                 };
-                
+
+
+                await sendConfirmationEmail(login);
                 return res.status(201).json({ status:201, message: "Konto utworzone pomyślnie.", payload: safeRegisterPayload });
             } else {
                 return res.status(409).json({ status:409, error: "Ten login jest już zajęty." });
