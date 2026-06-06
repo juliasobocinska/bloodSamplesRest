@@ -10,18 +10,34 @@ const userController = {
         try {
             const login = String(req.body.username || "").trim();
             const password = String(req.body.password || "");
-            const full_name = String(req.body.full_name || "Nowy Użytkownik");
+            const full_name = String(req.body.full_name);
             const hasNumber = /\d/.test(password);
 
             //walidacja loginu i hasła
-            if (!(login.length > 3 && password.length > 5 && hasNumber)) {
+            if (!(password.length > 5 && hasNumber)) {
                 return res.status(400).json({ 
-                    error: "Login musi mieć min. 4 znaki, a hasło min. 6 znaków i zawierać cyfrę." 
+                    status: 400,
+                    error: "Hasło musi zawierać min. 6 znaków i zawierać cyfrę." 
                 });
             }
 
             // Sprawdzenie czy użytkownik już istnieje
             const existingUser = await userModel.findUserByLogin(login);
+
+            const validateEmail = (email) => {
+            return String(login)
+                .toLowerCase()
+                .match(
+                /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+                );
+            };
+
+            if (!validateEmail(login)) {
+                return res.status(400).json({
+                    status: 400,
+                    error: "Nieprawidłowy format email." 
+                });
+            }
 
             if (!existingUser) {
                 const newUser = {

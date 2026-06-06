@@ -64,12 +64,12 @@ const handleLogin = async () => {
 
         <form @submit.prevent="handleLogin">
           <div class="form-group">
-            <label for="login" class="login-label">Login:</label>
+            <label for="login" class="login-label">Email:</label>
             <input 
             v-model="username" 
             id="login" 
-            type="text" 
-            placeholder="Wpisz login" 
+            type="email" 
+            placeholder="Wpisz email" 
             required />
           </div>
 
