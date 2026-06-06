@@ -16,7 +16,8 @@ CREATE TABLE IF NOT EXISTS orders (
     status VARCHAR(20) DEFAULT 'pending',
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     age INTEGER,
-    quantity INTEGER DEFAULT 1
+    quantity INTEGER DEFAULT 1,
+    address TEXT
 );
 
 -- 3. Tabela Wyników (Results)

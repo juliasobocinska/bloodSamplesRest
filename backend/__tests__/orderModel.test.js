@@ -28,7 +28,7 @@ describe('Order model', () => {
   });
 
   it('addToDatabase should insert order and return created row', async () => {
-    const order = { age: 30, quantity: 2, tests: 'blood', owner: 11 };
+    const order = { age: 30, quantity: 2, tests: 'blood', owner: 11, address: '123 Street' };
     const returned = { id: 3, ...order };
     db.query.mockResolvedValueOnce({ rows: [returned] });
 
@@ -36,7 +36,7 @@ describe('Order model', () => {
 
     expect(db.query).toHaveBeenCalledWith(
       expect.stringContaining('INSERT INTO orders'),
-      [order.age, order.quantity, order.tests, order.owner]
+      [order.age, order.quantity, order.tests, order.owner, order.address]
     );
     expect(result).toEqual(returned);
   });

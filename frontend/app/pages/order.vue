@@ -9,6 +9,11 @@ const orderId = ref(null)
 
 const age = ref('')
 const quantitySamples = ref(1)
+const address = ref(null)
+
+function onAddressSelected(a) {
+  address.value = a
+}
 
 const availableTests = ref([
   {id:1, label: 'Tarczyca (TSH)', checked: false},
@@ -44,9 +49,11 @@ onMounted(async () => {
 
       if (response && response.payload) {
         age.value = response.payload.age
+        address.value = {formatted: response.payload.address}
         quantitySamples.value = response.payload.quantity || response.payload.quantity_samples
         
-        const savedTests = response.payload.tests ? response.payload.tests.split(', ') : []
+        const savedTests = response.payload.sample_type ? response.payload.sample_type.split(', ') : []
+        console.log("Pobrane badania z serwera:", savedTests)
         availableTests.value.forEach(test => {
           test.checked = savedTests.includes(test.label)
         })
@@ -81,7 +88,8 @@ const submitOrder = async () => {
       body: {
         age: age.value,
         quantity_samples: quantitySamples.value,
-        tests: selectedTests.value
+        tests: selectedTests.value,
+        address: address.value ? address.value.formatted : null,
       }
     })
 
@@ -168,6 +176,11 @@ const logout = () => {
                 :ui="{ base: 'data-[state=checked]:bg-violet-500 data-[state=checked]:border-violet-500'}"
               />
             </div>
+          </div>
+
+          <div>
+            <AddressAutocomplete @selected="onAddressSelected" />
+            <p v-if="address">Wybrany adres: {{ address.formatted }}</p>
           </div>
 
           <button type="submit" class="btn-submit">

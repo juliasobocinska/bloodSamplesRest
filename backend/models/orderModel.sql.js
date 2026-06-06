@@ -1,12 +1,13 @@
 const db = require('./db'); // połączenie z Neonem (baza danych)
 
 class Order {
-    constructor(age, quantity, tests, date, owner) {
+    constructor(age, quantity, tests, date, owner, address) {
         this.age = age;
         this.quantity = quantity;
         this.tests = tests;
         this.date = date;
         this.owner = owner;
+        this.address = address;
     }
 
     // Pobieranie wszystkich zamówień z bazy
@@ -35,13 +36,13 @@ class Order {
     // Dodawanie zamówienia do PostgreSQL
     static async addToDatabase (newObj) {
         try {
-            const {age, quantity, tests, owner} = newObj;
+            const {age, quantity, tests, owner, address} = newObj;
             const query = `
-            INSERT INTO orders (age, quantity, sample_type, user_id)
-            VALUES ($1,$2, $3, $4)
+            INSERT INTO orders (age, quantity, sample_type, user_id, address)
+            VALUES ($1,$2, $3, $4, $5)
             RETURNING *`;
 
-            const res = await db.query(query, [age, quantity, tests, owner]);
+            const res = await db.query(query, [age, quantity, tests, owner, address]);
             return res.rows[0];
         } catch (err) {
             console.error('Błąd addToDatabase:', err);
@@ -90,12 +91,12 @@ class Order {
     // Zapisywanie zmian zamówienia
     static async updateInDatabase(id, updatedData, uid) {
         try {
-            const {age, quantity, sample_type} = updatedData;
+            const {age, quantity, sample_type, address} = updatedData;
             const query = `
             UPDATE orders
-            SET age = $1, quantity = $2, sample_type = $3
-            WHERE id = $4 and user_id = $5`;
-            await db.query(query, [age, quantity, sample_type, id, uid]);
+            SET age = $1, quantity = $2, sample_type = $3, address = $4
+            WHERE id = $5 and user_id = $6`;
+            await db.query(query, [age, quantity, sample_type, address, id, uid]);
             return true;
         } catch (err) {
             console.error('Błąd updateInDatabase:', err);

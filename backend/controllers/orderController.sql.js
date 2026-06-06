@@ -22,7 +22,7 @@ const orderController = {
     handleOrder: async (req, res) => {
         try {
             const owner = req.user?.id;
-            const { age, quantity_samples, tests } = req.body;
+            const { age, quantity_samples, tests, address } = req.body;
 
             if (!owner) {
                 return res.status(401).json({ status: 401, error: "Brak autoryzacji. Zaloguj się ponownie." });
@@ -49,6 +49,7 @@ const orderController = {
                 tests: Array.isArray(tests) ? tests.join(', ') : (tests || "Brak badań"),
                 user_id: owner, // na wypadek kolumny user_id w bazie
                 owner: owner,   // na wypadek kolumny owner w bazie
+                address: address || null,
                 created_at: new Date()
             };
 
@@ -119,7 +120,7 @@ const orderController = {
     handleUpdate: async (req, res) => {
         try {
             const orderId = req.params.id;
-            const { age, quantity_samples, tests } = req.body;
+            const { age, quantity_samples, tests, address } = req.body;
             
             // NAPRAWIONE: Wyciągamy ID z tokenu zamiast req.body.userId
             const uid = req.user?.id; 
@@ -131,11 +132,13 @@ const orderController = {
             if(tests.length < 1) {
                 return res.status(400).json({ status: 400, error: "Minimum jedno badanie powinno być zaznaczone." })
             }
+            
 
             const updateOrder = {
                 age: parseInt(age),
                 quantity: parseInt(quantity_samples),
-                sample_type: Array.isArray(tests) ? tests.join(', ') : tests
+                sample_type: Array.isArray(tests) ? tests.join(', ') : tests,
+                address: address || null
             };
 
             await Order.updateInDatabase(orderId, updateOrder, uid);
